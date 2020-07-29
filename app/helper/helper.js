@@ -28,8 +28,8 @@ const generate_token = (length)=>{
 const formatHour = (hour)=>{
     if(hour == null) return "00:00"
     const hournew = new Date(hour)
-    const hourdata = new Date(hournew-(60*1000*480) )
-    //const hourdata = hournew
+   // const hourdata = new Date(hournew-(60*1000*480) )
+    const hourdata = hournew
     const _hour = `0${hourdata.getHours()}`
     const _minute = `0${hourdata.getMinutes()}`
     return `${_hour.slice(-2)}:${_minute.slice(-2)}`
