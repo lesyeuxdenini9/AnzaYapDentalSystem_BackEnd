@@ -56,7 +56,7 @@ const server = require('./app/config/server')
 let http = require('http').Server(app)
 let io = require('socket.io')(http)
 //io.origins(['https://anza-yap-dental-clinic.herokuapp.com'])
-io.origins('https://anza-yap-dental-clinic.herokuapp.com')
+io.origins('*:*')
 
 http.listen(server.server.port, ()=>{
   console.log(`Server running at port ${server.server.port}: http://127.0.0.1:${server.server.port}`)
