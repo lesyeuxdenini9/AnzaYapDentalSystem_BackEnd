@@ -5,7 +5,7 @@ const  app = express()
 const cors = require('cors')
 const corsOptions = {
       // origin: '*',
-      origin: ['http://localhost:8081'],
+      origin: ['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com'],
       methods: ['GET','POST','OPTIONS','PUT','PATCH','DELETE'],
       allowedHeaders: ['Origin','X-Requested-With','Content-Type','Accept','Authorization'],
       optionsSuccessStatus: 200,
@@ -55,7 +55,7 @@ const server = require('./app/config/server')
 // SOCKET FOR REALTIME LISTENING EVENT
 let http = require('http').Server(app)
 let io = require('socket.io')(http)
-io.origins(['http://localhost:8081'])
+io.origins(['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com'])
 
 http.listen(server.server.port, ()=>{
   console.log(`Server running at port ${server.server.port}: http://127.0.0.1:${server.server.port}`)
