@@ -2,6 +2,7 @@ const controller = {}
 const validator = require('../helper/validator')
 const DentistData = require('../dataaccess/dentist')
 const { Dentist } = require('../models/index')
+const { response } = require('express')
 
 controller.getlist = (req,res,next)=>{
     DentistData.List()
@@ -88,6 +89,11 @@ controller.update = (req,res,next)=>{
             res.json(dentistInfo)
         }
     })
+}
+
+controller.search = (req,res,next)=>{
+    const {search,branch} = req.body
+    DentistData.search(search,branch).then((response)=>res.json({data: response})).catch(err=>res.status(500).json(err))
 }
 
 

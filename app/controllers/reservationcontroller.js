@@ -44,6 +44,8 @@ controller.create = (req,res,next)=>{
                 type: type,
                 dentistId: dentist,
                 transactionId: transaction,
+                Start: `${start}`,
+                End: `00:00`,
             }
 
 
@@ -303,6 +305,8 @@ controller.createWalkInReservation = async (req,res,next)=>{
                     transactionId: transactionid,
                     branchId: branch,
                     remarks: remarks,
+                    Start: start,
+                    End: end,
                 }
 
 
@@ -435,6 +439,8 @@ controller.changeReservationDate = async (req,res,next)=>{
                                                     starttime: newstart,
                                                     endtime: newend,
                                                     date: date,
+                                                    Start: start,
+                                                    End: end
                                                 },{
                                                     where: {
                                                         id: info.id
@@ -683,7 +689,7 @@ controller.confirm = (req,res,next)=>{
                         let userinfo = await req.user
                         let username = userinfo.fullname
                         let message = `Reservation No: ${reserveNo} request has been approved . ${remarks}`
-                        Reservation.update({approvedBy: username,dentistId:dentist,status: 1,starttime: `${date} ${start}:00`, endtime: `${date} ${end}:00`},{where: {id: idno}})
+                        Reservation.update({approvedBy: username,dentistId:dentist,status: 1,starttime: `${date} ${start}:00`, endtime: `${date} ${end}:00`,Start: start, End: end},{where: {id: idno}})
                         .then(response=> Notification.create({
                             isadmin: 0,
                             reservationId: idno,
@@ -733,7 +739,7 @@ controller.confirm = (req,res,next)=>{
 }
 
 controller.proceedTransaction = async (req,res,next)=>{
-    const { TransactionId , id ,type , date , Dentist , DentistId , userId } = req.body
+    const { TransactionId , id ,type , date , Dentist , DentistId , userId , branchId, Start , End} = req.body
    
     sequelize.transaction(async (t) => {
 
@@ -754,7 +760,10 @@ controller.proceedTransaction = async (req,res,next)=>{
                 userId: userId,
                 reservationId: id,
                 createdBy: createdby,
-                modifiedBy: modifiedby
+                modifiedBy: modifiedby,
+                branchId: branchId,
+                Start: Start,
+                End: End
             },{transaction: t})
 
             const updatetransaction = await Transaction.update({
@@ -778,6 +787,8 @@ controller.proceedTransaction = async (req,res,next)=>{
         }else{
             const updatetransaction = await Transaction.update({
                 status: 0,
+                Start: Start,
+                End: End
             },{
                 where: {
                     modifiedby: modifiedby,
@@ -819,7 +830,9 @@ controller.changeTimeReservation = async (req,res,next)=>{
         
         let updateinfo = await Reservation.update({
             starttime: event.start,
-            endtime: event.end
+            endtime: event.end,
+            Start: formatHour(event.start),
+            End: formatHour(event.end),
         },{
             where: {
                 id: event.id

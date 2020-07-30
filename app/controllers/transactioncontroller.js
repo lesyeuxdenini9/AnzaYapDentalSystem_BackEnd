@@ -190,7 +190,7 @@ controller.save = (req,res,next)=>{
         if(!response.status){
             res.json(response.err)
         }else{
-            const { branch, patient , servicelist , dentistid, dentistname, date } = req.body
+            const { branch, patient , servicelist , dentistid, dentistname, date , Start , End } = req.body
             
             sequelize.transaction(async (t) => {
 
@@ -213,7 +213,9 @@ controller.save = (req,res,next)=>{
                         dentistId: dentistid,
                         userId: patient,
                         createdBy: createdby,
-                        modifiedBy: modifiedby
+                        modifiedBy: modifiedby, 
+                        Start: Start,
+                        End: End,
                     },{transaction: t})
 
                     let tID = transactioninfo.dataValues.id

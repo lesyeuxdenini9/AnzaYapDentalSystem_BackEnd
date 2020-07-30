@@ -55,7 +55,18 @@ const server = require('./app/config/server')
 // SOCKET FOR REALTIME LISTENING EVENT
 let http = require('http').Server(app)
 let io = require('socket.io')(http)
-io.origins(['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com'])
+// io.origins(['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com'])
+// io.origins('*:*')
+// io.set('origins', '*:*');
+// io.set('origins', 'https://anza-yap-dental-clinic.herokuapp.com');
+
+io.origins((origin, callback) => {
+  if (origin !== 'http://localhost:8081') {
+      return callback('origin not allowed', false);
+  }
+  
+  callback(null, true);
+});
 
 http.listen(server.server.port, ()=>{
   console.log(`Server running at port ${server.server.port}: http://127.0.0.1:${server.server.port}`)

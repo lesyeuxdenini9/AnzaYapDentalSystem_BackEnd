@@ -192,5 +192,10 @@ controller.update = (req,res,next)=>{
     })
 }
 
+controller.search = (req,res,next)=>{
+    const {search,branch,type} = req.body
+    MedicineData.search(search,branch,type).then(response=>res.json({data: response})).catch(err=>res.status(500).json(err))
+}
+
 
 module.exports = controller

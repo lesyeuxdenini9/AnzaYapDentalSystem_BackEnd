@@ -9,6 +9,10 @@ const { response } = require('../routes/api')
 const saltRounds = 10
 const controller = {}
 
+controller.search = (req,res,next)=>{
+    const { search , branch , type } = req.body
+    UserData.search(search,branch,type).then((response)=>res.json({data: response})).catch(err=>res.status(500).json(err)) 
+}
 
 controller.searchPatient = (req,res,next)=>{
        UserData.searchPatient(req.body)
@@ -122,7 +126,7 @@ controller.saveuser_superadmin = (req,res,next)=>{
         rules.password = "required|string|min:6|confirmed|strict"
         finalpassword = password
     }else{
-        rules.employeeNo = "required|string"
+       // rules.employeeNo = "required|string"
         finalpassword = "password"
     }
 
@@ -156,7 +160,6 @@ controller.saveuser_superadmin = (req,res,next)=>{
 
 controller.save = (req,res,next)=>{
     const rules = {
-        "branch": "required",
         "email": "required|email|unique:users,email",
         "firstname": "required|string",
         "lastname": "required|string",
@@ -164,13 +167,16 @@ controller.save = (req,res,next)=>{
         "bday": "required|date",
 
     }
+
+  
     let finalpassword = ""
     const { branch , email , fullname , employeeNo , bday , contact , address , usertype, password,middlename, firstname, lastname, gender, history } = req.body
+      if(usertype != 2 && usertype != 3) rules.branch = "required"
     if(usertype == 2){
         rules.password = "required|string|min:6|confirmed|strict"
         finalpassword = password
     }else{
-        rules.employeeNo = "required|string"
+      //  rules.employeeNo = "required|string"
         finalpassword = "password"
     }
 
@@ -196,6 +202,44 @@ controller.save = (req,res,next)=>{
             branchId: branch
         }
         const user = await User.create(newuser)
+
+        if(usertype == 2){
+            let teetharr = []
+            for(let x = 1 ; x <= 16 ; x++){
+                teetharr.push({
+                    userId: user.id,
+                    orderNo: parseInt(x),
+                    flag: 0,
+                })
+            }
+    
+            for(let y = 1 ; y <= 16 ; y++){
+                teetharr.push({
+                    userId: user.id,
+                    orderNo: parseInt(y),
+                    flag: 1,
+                })
+            }
+    
+            const userteeth = await Teeth.bulkCreate(teetharr)
+    
+            if(email != ""){
+               
+                const messagehtml = `<div style='height:50px;width:100%;background:#083D55'>
+                <span style="font-size:20pt;padding: 30px 0px 0px 10px; font-weight:bold;"><span style="color:#4167D6">Anza</span><span style="color:white">-</span><span style="color:orange;">Yap</span> <small style="color:white">Dental Clinic</small></span>
+                </div>
+                <h1>Hi ${firstname} ${middlename} ${lastname}</h1>
+                    <hr/>
+                    <p>You can now access our portal to view your transactions and appoint reservation in the future</p>
+                    <p>Email Add: ${email}</p>
+                    <p>Password: ${finalpassword}</p>
+                    <hr/>
+                    <p>You can change your password once you login</p>
+                    <p>Heres our website link: <a href="${process.env.FRONTEND_URL}/">Website link</a></p>
+                `
+                sendemail(email,"Registration",messagehtml,2)
+            }
+        }
         res.json(user)
         }
     })

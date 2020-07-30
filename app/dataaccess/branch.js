@@ -1,6 +1,21 @@
 const { Branch } = require('../models/index')
-
+const Sequelize = require('sequelize')
+const op = Sequelize.Op
 class Branch_ {
+
+    search(branch){
+        return new Promise((resolve,reject)=>{
+            Branch.scope("active","schedules").findAll({
+                where: {
+                    branch: {
+                        [op.like]: `%${branch}%`
+                    }
+                }
+            })
+            .then(data=>resolve(data))
+            .catch(err=>reject(err))
+        })
+    }
 
     publicList(){
         return new Promise((resolve,reject)=>{

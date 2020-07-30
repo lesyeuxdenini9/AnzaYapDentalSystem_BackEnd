@@ -3,6 +3,30 @@ const Sequelize = require('sequelize')
 const op = Sequelize.Op
 const literal = Sequelize.literal
 class Medicine_ {
+
+    search(search,branch,type){
+        return new Promise((resolve,reject)=>{
+            let data = Medicine.scope("active").findAll({
+                where: {
+                    branchId: branch,
+                    type: type,
+                    [op.or]: [
+                        {
+                            medicine: {
+                                [op.like]: `%${search}%`
+                            }
+                        },
+                        {
+                            code: {
+                                [op.like]: `%${search}%`
+                            } 
+                        }
+                    ]
+                }
+            })
+            resolve(data)
+        })
+    }
  
     List(branch,type){
         return new Promise((resolve,reject)=>{

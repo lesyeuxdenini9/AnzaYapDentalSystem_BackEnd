@@ -1,4 +1,4 @@
-const { Reservation, User , Dentist , Transaction , Treatment , Branch , Schedule} = require('../models/index')
+const { Reservation, User , Dentist , Transaction , Treatment , Branch , Schedule , Service} = require('../models/index')
 const { response } = require('express')
 const Sequelize = require('sequelize')
 const { where } = require('sequelize')
@@ -59,6 +59,12 @@ class Reservation_ {
                     },{
                         model: Treatment,
                         required: false,
+                        include: [
+                            {
+                                model: Service,
+                                required: true,
+                            }
+                        ]
                     },{
                         model: Branch,
                         required: true,
@@ -179,6 +185,12 @@ class Reservation_ {
                     {
                         model: Treatment,
                         required: false,
+                        include: [
+                            {
+                                model: Service,
+                                required: true,
+                            }
+                        ]
                     },
                     {
                         model: User,

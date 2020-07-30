@@ -34,6 +34,7 @@ app.patch('/user/archive/(:idno)',PassportAuthenticate(passport),checkisAuthenti
 app.patch('/user/changepass/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.changepass)
 app.patch('/user/changepassEmployee/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.changepassEmployee)
 app.post('/user/changepic',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.changepic)
+app.post('/user/search',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.search)
 
 app.delete('/user/remove/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.remove)
 app.get('/user/details/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.getDetails)
@@ -51,7 +52,7 @@ app.get('/service/list/(:branch)',PassportAuthenticate(passport),checkisAuthenti
 app.post('/service/save',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.save)
 app.patch('/service/archive/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.archive)
 app.patch('/service/update/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.update)
-
+app.post('/service/search',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.search)
 
 app.get('/medicine/list/(:branch)/(:type)',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.getlist)
 app.post('/medicine/save',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.save)
@@ -60,6 +61,7 @@ app.patch('/medicine/update/(:idno)',PassportAuthenticate(passport),checkisAuthe
 app.post(`/medicine/addstock`,PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.addstock)
 app.post('/medicine/getStocksin',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.getStocksin)
 app.post('/medicine/getInfo',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.getInfo)
+app.post('/medicine/search',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.search)
 
 
 app.post('/branch/save',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.save)
@@ -73,13 +75,13 @@ app.get('/branch/getListDentist',PassportAuthenticate(passport),checkisAuthentic
 app.get('/branch/getListMedicine/(:type)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListMedicine)
 app.get('/branch/getListAllInfo',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListAllInfo)
 app.get('/branch/getInfo/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getInfo)
-
+app.get('/branch/search/(:branch)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.search)
 
 app.get('/dentist/list',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.getlist)
 app.post('/dentist/save',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.save)
 app.patch('/dentist/archive/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.archive)
 app.patch('/dentist/update/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.update)
-
+app.post('/dentist/search',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.search)
 
 app.post('/transaction/save',PassportAuthenticate(passport),checkisAuthenticated,transactioncontroller.save)
 app.get('/transaction/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,transactioncontroller.getTransaction)

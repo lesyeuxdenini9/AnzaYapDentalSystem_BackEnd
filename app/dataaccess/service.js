@@ -1,5 +1,6 @@
 const { Service } = require('../models/index')
-
+const Sequelize = require('sequelize')
+const op = Sequelize.Op
 class Service_ {
  
     List(branch){
@@ -16,6 +17,13 @@ class Service_ {
     getService(idno){
         return new Promise((resolve,reject)=>{
             let data = Service.scope(["active"]).findOne({where: {id: idno}})
+            resolve(data)
+        })
+    }
+
+    search(search,branch){
+        return new Promise((resolve,reject)=>{
+            let data = Service.scope(["active"]).findAll({where: {service: {[op.like]: `%${search}%`},branchId: branch}})
             resolve(data)
         })
     }

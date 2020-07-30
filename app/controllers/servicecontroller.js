@@ -2,6 +2,7 @@ const controller = {}
 const validator = require('../helper/validator')
 const ServiceData = require('../dataaccess/service')
 const { Service } = require('../models/index')
+const { response } = require('../routes/api')
 
 controller.getlist = (req,res,next)=>{
     const { branch } = req.params
@@ -17,7 +18,7 @@ controller.save = (req,res,next)=>{
     const rules = {
         'branch': 'required',
         'service': 'required|string',
-        'description': 'required|string',
+        // 'description': 'required|string',
         'regularPrice': ['regex:/^\\d*(\\.\\d*)?$/','required','numeric'],
     }
 
@@ -75,6 +76,11 @@ controller.update = (req,res,next)=>{
             res.json(serviceInfo)
         }
     })
+}
+
+controller.search = (req,res,next)=>{
+    const { search , branch } = req.body
+    ServiceData.search(search,branch).then((response)=>res.json({data: response})).catch(err=>res.status(500).json(err)) 
 }
 
 

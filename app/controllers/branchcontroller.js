@@ -146,5 +146,10 @@ controller.update = (req,res,next)=>{
     })
 }
 
+controller.search = (req,res,next)=>{
+    const { branch } = req.params
+    BranchData.search(branch).then(response=>res.json({data: response})).catch(err=>res.status(500).json(err))
+}
+
 
 module.exports = controller

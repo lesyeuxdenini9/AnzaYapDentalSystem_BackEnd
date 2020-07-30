@@ -7,6 +7,13 @@ const literal = Sequelize.literal
 
 class User_ {
 
+    search(search,branch,type){
+        return new Promise((resolve,reject)=>{
+            let data = User.scope(["active"]).findAll({where: {fullname: {[op.like]: `%${search}%`},branchId: branch,usertype: type}})
+            resolve(data)
+        })
+    }
+
     searchPatient({ lastname, middlename , firstname ,email }){
       let whereclause = {}
       if(lastname!="") whereclause.lastname = { [op.like]: `%${lastname}%`}

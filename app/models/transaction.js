@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     branchId: DataTypes.INTEGER,
     discount: DataTypes.FLOAT,
     medRemarks: DataTypes.STRING,
+    Start: DataTypes.STRING,
+    End: DataTypes.STRING
   }, {});
   Transaction.associate = function(models) {
     // associations can be defined here
