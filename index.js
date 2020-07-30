@@ -5,7 +5,7 @@ const  app = express()
 const cors = require('cors')
 const corsOptions = {
       // origin: '*',
-      origin: ['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com'],
+      origin: ['https://anza-yap-dental-clinic.herokuapp.com'],
       methods: ['GET','POST','OPTIONS','PUT','PATCH','DELETE'],
       allowedHeaders: ['Origin','X-Requested-With','Content-Type','Accept','Authorization'],
       optionsSuccessStatus: 200,
@@ -64,9 +64,9 @@ io.origins((origin, callback) => {
   if (origin !== 'http://localhost:8081') {
       return callback('origin not allowed', false);
   }
-  
-  callback(null, true);
 });
+
+  
 
 http.listen(server.server.port, ()=>{
   console.log(`Server running at port ${server.server.port}: http://127.0.0.1:${server.server.port}`)
