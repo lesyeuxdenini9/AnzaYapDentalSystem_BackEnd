@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     branchId: DataTypes.INTEGER,
     change: DataTypes.FLOAT,
     isPharmacy: DataTypes.INTEGER,
+    discount: DataTypes.FLOAT,
   }, {});
   Billing.associate = function(models) {
     // associations can be defined here
@@ -23,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     Billing.belongsTo(models.Branch)
     Billing.belongsTo(models.User)
     Billing.hasOne(models.Healthcard)
+    Billing.hasMany(models.Billitem)
   };
   return Billing;
 };

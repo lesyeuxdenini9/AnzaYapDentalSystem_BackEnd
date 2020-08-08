@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Billitem = sequelize.define('Billitem', {
-    billId: DataTypes.INTEGER,
+    billingId: DataTypes.INTEGER,
     item: DataTypes.STRING,
     description: DataTypes.STRING,
     medicineId: DataTypes.INTEGER,
@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Billitem.associate = function(models) {
     // associations can be defined here
+    Billitem.belongsTo(models.Billing)
+    Billitem.belongsTo(models.Medicine)
   };
   return Billitem;
 };

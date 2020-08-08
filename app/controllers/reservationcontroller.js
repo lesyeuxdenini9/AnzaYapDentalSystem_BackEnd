@@ -68,6 +68,7 @@ controller.create = (req,res,next)=>{
                         service: service.service,
                         amount: service.price,
                         serviceId: service.id,
+                        actualAmount: service.price
                     }
                 })
     
@@ -567,6 +568,8 @@ controller.createFollowupReservation = async (req,res,next)=>{
                         type: 1,
                         approvedBy: approvedBy,
                         transactionId: transaction.id,
+                        Start: start,
+                        End: end
                     })  
                     .then(async (response)=> {
                         await Reservation.update({
@@ -788,12 +791,12 @@ controller.proceedTransaction = async (req,res,next)=>{
             const updatetransaction = await Transaction.update({
                 status: 0,
                 Start: Start,
-                End: End
+                End: End,
+                modifiedby: modifiedby,
             },{
                 where: {
-                    modifiedby: modifiedby,
                     id: TransactionId,
-                    reservationId: id,
+                    // reservationId: id,
                 },
                 transaction: t
             })

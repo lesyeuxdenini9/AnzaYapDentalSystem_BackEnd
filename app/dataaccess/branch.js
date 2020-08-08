@@ -1,5 +1,6 @@
-const { Branch } = require('../models/index')
+const { Branch , Medicine } = require('../models/index')
 const Sequelize = require('sequelize')
+const e = require('express')
 const op = Sequelize.Op
 class Branch_ {
 
@@ -60,9 +61,9 @@ class Branch_ {
         })
     }
 
-    getInfo(idno){
+    getInfo(idno,type){
         return new Promise((resolve,reject)=>{
-               Branch.scope("active","schedules","services","dentist",{method: ["medicines", 0]}).findAll({
+               Branch.scope("active","schedules","services","dentist",{method: ["medicines", type]}).findAll({
                     where: {
                         id: idno
                     }
@@ -90,16 +91,43 @@ class Branch_ {
 
     getListMedicine(branchid,type){
         return new Promise((resolve,reject)=>{
-            if(branchid == null){
-               Branch.scope("active","schedules",{method: ['medicines', type]}).findAll()
-               .then(data=>resolve(data))
-            }else{
-               Branch.scope("active", "schedules",{method: ['medicines', type]}).findAll({
-                    where: {
-                        id: branchid
+                if(branchid == null){
+                    if(type != 'All'){
+                        Branch.scope("active","schedules",{method: ['medicines', type]}).findAll()
+                        .then(data=>resolve(data))
+                    }else{
+                        Branch.scope("active","schedules").findAll({
+                            include: [
+                                {
+                                    model: Medicine,
+                                    required: false,
+                                }
+                            ]
+                        })
+                        .then(data=>resolve(data))
+                    }   
+               
+                }else{
+                    if(type != 'All'){
+                        Branch.scope("active", "schedules",{method: ['medicines', type]}).findAll({
+                                where: {
+                                    id: branchid
+                                }
+                            }).then(data=>resolve(data))
+                    }else{
+                        Branch.scope("active", "schedules").findAll({
+                            include: [
+                                {
+                                    model: Medicine,
+                                    required: false,
+                                }
+                            ],
+                            where: {
+                                id: branchid
+                            }
+                        }).then(data=>resolve(data))
                     }
-                }).then(data=>resolve(data))
-            }
+                }
             
           
         })

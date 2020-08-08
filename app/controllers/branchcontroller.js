@@ -102,8 +102,8 @@ controller.getListAllInfo = async (req,res,next)=>{
 }
 
 controller.getInfo = (req,res,next)=>{
-    const { idno }  = req.params
-    BranchData.getInfo(idno)
+    const { idno , type }  = req.params
+    BranchData.getInfo(idno, type)
         .then((response)=>res.json({data: response}))
         .catch(err=>res.status(500).json(err))
 }

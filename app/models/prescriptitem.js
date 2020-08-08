@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     medicineId: DataTypes.INTEGER,
     dosage: DataTypes.STRING,
     days: DataTypes.STRING,
+    remarks: DataTypes.STRING,
   }, {});
   Prescriptitem.associate = function(models) {
     Prescriptitem.belongsTo(models.Prescription)

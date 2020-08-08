@@ -184,6 +184,8 @@ controller.save = (req,res,next)=>{
         'patient': 'required|integer',
         'dentistname': 'required|string',
         'servicelist': 'required|array',
+        'Start': 'required|string',
+        'End': 'required|string',
     }
 
     validator(req.body,rules,{}).then(async (response)=>{
@@ -302,11 +304,12 @@ controller.updatePrescription = (req,res,next)=>{
             return {
                 prescriptionId: prescription.id,
                 medicine: item.medicine,
-                medicineId: item.id,
+                medicineId: item.medicineId,
                 qty: parseFloat(item.qty),
                 amount: item.amount,
                 dosage:item.dosage,
-                days: item.days,         
+                days: item.days,
+                remarks: item.remarks         
             }
         })
 
@@ -344,7 +347,8 @@ controller.createPrescription = (req,res,next)=>{
                     qty: parseFloat(item.qty),
                     amount: item.amount,
                     dosage:item.dosage,
-                    days: item.days,         
+                    days: item.days, 
+                    remarks: item.remarks        
                 }
             })
             let prescriptitems = await Prescriptitem.bulkCreate(itemList)
@@ -841,7 +845,7 @@ controller.createBillPharmarcy = (req,res,next)=>{
         if(!response.status){
             res.json(response.err)
         }else{
-           const { patient, items, totalAmount , payment } = req.body
+           const { patient, items, totalAmount , payment , branch , discount} = req.body
 
             let currentstocks = []
 
@@ -868,13 +872,18 @@ controller.createBillPharmarcy = (req,res,next)=>{
                     customerName: patient.name,
                     prescriptionId: patient.prescriptionId,
                     totalAmount: totalAmount,
-                    payment: parseFloat(payment),
+                    payment: totalAmount,
+                    change:  parseFloat(payment) - parseFloat(totalAmount),
                     createdBy: createdby,
                     modifiedBy: modifiedby,
+                    isPharmacy: 1,
+                    date: formatDate(new Date()),
+                    branchId: branch,
+                    discount: discount,
                 },{transaction: t})
     
                 let updatebill = await Billing.update({
-                    billrefNo: `BP${maskzero(11,createbill.id)}`
+                    billrefNo: `PH${maskzero(11,createbill.id)}`
                 },{
                     where: {
                         id: createbill.id
@@ -884,7 +893,7 @@ controller.createBillPharmarcy = (req,res,next)=>{
     
                 let billitems = items.map((item)=>{
                     return {
-                        billId: createbill.id,
+                        billingId: createbill.id,
                         item: item.medicine,
                         description: item.description,
                         medicineId: item.id,
@@ -928,5 +937,9 @@ controller.createBillPharmarcy = (req,res,next)=>{
     })
 }
 
+controller.getPastListPharmacy = (req,res,next)=>{
+    TransactionData.getPastListPharmacy(req.body).then(response=>res.json({data: response})).catch(err=>res.status(500).json(err))
+
+}
 
 module.exports = controller

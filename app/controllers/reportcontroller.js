@@ -1,9 +1,33 @@
 const controller = {}
 const validator = require('../helper/validator')
-const { Billing , Transaction , Dentist , User, sequelize } = require('../models/index')
+const { Billing , Transaction , Dentist , User, sequelize , Billitem} = require('../models/index')
 const Sequelize = require('sequelize')
 const { STRING } = require('sequelize')
+const { response } = require('express')
 const op = Sequelize.Op
+const literal = Sequelize.literal
+
+controller.pharmacyPurchaseRecords = (req,res,next)=>{
+    const { start , end , refno , branch } = req.body
+    console.log(req.body)
+    let whereclause = {}
+    if(refno != ""){
+        whereclause.billrefNo = {
+            [op.like] : `%${refno}`
+        }
+    }else{
+        whereclause = {
+            [op.and]: [
+                literal(`DATE(billing.createdAt) >= '${start}' AND DATE(billing.createdAt) <= '${end}'`)
+            ]
+        }
+        
+    }
+
+    whereclause.branchId = branch
+    whereclause.isPharmacy = 1
+    Billing.findAll({include: [{model: Billitem,required: true}],where: whereclause,order: [["createdAt","ASC"]]}).then(response=>res.json({data: response})).catch(err=>res.status(500).json(err))
+}
 
 controller.billingRecords = (req,res,next)=>{
     const { start , end , refno , branch } = req.body
@@ -59,11 +83,83 @@ controller.billingRecords = (req,res,next)=>{
         .catch(err=>res.status(500).json(err))
 }
 
+controller.pharmacy_daily = async (req,res,next)=>{
+    const { start ,end , branch } = req.body
+    let query = `SELECT SUM(payment) AS totalsales,date FROM billings 
+                WHERE date >= '${start}' AND date <= '${end}' 
+                AND branchId = ${branch}
+                AND isPharmacy = 1
+                GROUP BY date 
+                ORDER BY date ASC`
+
+    let salesdaily = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
+
+    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+            FROM billitems bi
+            LEFT JOIN billings b ON b.id = bi.billingId
+            WHERE b.branchId = ${branch} AND ( b.date >= '${start}' AND b.date <= '${end}')
+            GROUP BY bi.medicineId
+            ORDER BY totalcount DESC LIMIT 10`
+    let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
+
+    res.json({graph: salesdaily, serviceMostavail: servicegraphAvail})
+}
+
+controller.pharmacy_monthly = async (req,res,next)=>{
+    const { startmonth , startyear , endmonth , endyear , branch } = req.body
+
+    let query = `SELECT SUM(payment) AS totalsales,MONTH(date) as monthname,YEAR(date) as yearname
+                FROM billings
+                WHERE (MONTH(date) >= ${startmonth} AND YEAR(date) >= ${startyear})
+                AND (MONTH(date) <= ${endmonth} AND YEAR(date) <= ${endyear})
+                AND branchId = ${branch}
+                AND isPharmacy = 1
+                GROUP BY MONTH(date),YEAR(date)
+                ORDER BY YEAR(date) ASC,MONTH(date) ASC`
+    let salesmonthly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
+
+    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+            FROM billitems bi
+            LEFT JOIN billings b ON b.id = bi.billingId
+            WHERE b.branchId = ${branch} AND ( MONTH(b.date) >= '${startmonth}' AND YEAR(b.date) >= '${startyear}')
+            AND  ( MONTH(b.date) <= '${endmonth}' AND YEAR(b.date) <= '${endyear}')
+            GROUP BY bi.medicineId
+            ORDER BY totalcount DESC LIMIT 10`
+
+    let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
+
+    res.json({graph: salesmonthly,serviceMostavail: servicegraphAvail})
+}
+
+controller.pharmacy_yearly = async (req,res,next)=>{
+    const {  startyear , endyear , branch } = req.body
+    let query = `SELECT SUM(payment) AS totalsales,YEAR(date) as yearname
+                 FROM billings
+                 WHERE YEAR(date) >= ${startyear} AND YEAR(date) <= ${endyear}
+                 AND branchId = ${branch}
+                 AND isPharmacy = 1
+                 GROUP BY YEAR(date)
+                 ORDER BY YEAR(date) ASC`
+    let salesyearly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
+
+    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+            FROM billitems bi
+            LEFT JOIN billings b ON b.id = bi.billingId
+            WHERE b.branchId = ${branch} AND ( YEAR(b.date) >= '${startyear}' AND YEAR(b.date) <= '${endyear}')
+            GROUP BY bi.medicineId
+            ORDER BY totalcount DESC LIMIT 10`
+
+    let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
+
+    res.json({graph: salesyearly,serviceMostavail: servicegraphAvail})
+}
+
 controller.sales_daily = async (req,res,next)=>{
     const { start ,end , branch } = req.body
     let query = `SELECT SUM(payment) AS totalsales,date FROM billings 
                  WHERE date >= '${start}' AND date <= '${end}' 
                  AND branchId = ${branch}
+                 AND isPharmacy = 0
                  GROUP BY date 
                  ORDER BY date ASC`
     let salesdaily = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
@@ -98,6 +194,7 @@ controller.sales_monthly = async (req,res,next)=>{
                  WHERE (MONTH(date) >= ${startmonth} AND YEAR(date) >= ${startyear})
                  AND (MONTH(date) <= ${endmonth} AND YEAR(date) <= ${endyear})
                  AND branchId = ${branch}
+                 AND isPharmacy = 0
                  GROUP BY MONTH(date),YEAR(date)
                  ORDER BY YEAR(date) ASC,MONTH(date) ASC`
     let salesmonthly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
@@ -122,6 +219,7 @@ controller.sales_yearly = async (req,res,next)=>{
                  FROM billings
                  WHERE YEAR(date) >= ${startyear} AND YEAR(date) <= ${endyear}
                  AND branchId = ${branch}
+                 AND isPharmacy = 0
                  GROUP BY YEAR(date)
                  ORDER BY YEAR(date) ASC`
     let salesyearly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})

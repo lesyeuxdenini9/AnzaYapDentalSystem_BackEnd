@@ -21,6 +21,7 @@ const user = require('../dataaccess/user')
 
 
 app.get('/dashboard/getData/(:branch)',PassportAuthenticate(passport),checkisAuthenticated,dashboardcontroller.getData)
+app.get('/dashboard/dentistTransaction/(:branch)',PassportAuthenticate(passport),checkisAuthenticated,dashboardcontroller.dentistTransaction)
 
 app.post('/user/register',usercontroller.save)
 
@@ -74,7 +75,7 @@ app.get('/branch/getListService',PassportAuthenticate(passport),checkisAuthentic
 app.get('/branch/getListDentist',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListDentist)
 app.get('/branch/getListMedicine/(:type)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListMedicine)
 app.get('/branch/getListAllInfo',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListAllInfo)
-app.get('/branch/getInfo/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getInfo)
+app.get('/branch/getInfo/(:idno)/(:type)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getInfo)
 app.get('/branch/search/(:branch)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.search)
 
 app.get('/dentist/list',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.getlist)
@@ -109,7 +110,7 @@ app.get('/transaction/viewBill/(:idno)',PassportAuthenticate(passport),checkisAu
 app.post('/transaction/getRecords',PassportAuthenticate(passport),checkisAuthenticated,transactioncontroller.getRecords)
 app.patch('/transaction/saveMedRemarks',PassportAuthenticate(passport),checkisAuthenticated,transactioncontroller.saveMedRemarks)
 app.patch('/transaction/addDiscount',PassportAuthenticate(passport),checkisAuthenticated,transactioncontroller.addDiscount)
-
+app.post('/transaction/getPastListPharmacy',PassportAuthenticate(passport),checkisAuthenticated,transactioncontroller.getPastListPharmacy)
 
 app.post('/reservation/create',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.create)
 app.get('/reservation/get/(:status)',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.getReservation)
@@ -145,5 +146,9 @@ app.post('/reports/billingRecords',PassportAuthenticate(passport),checkisAuthent
 app.post('/reports/sales_daily',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.sales_daily)
 app.post('/reports/sales_monthly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.sales_monthly)
 app.post('/reports/sales_yearly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.sales_yearly)
+app.post('/reports/pharmacyPurchaseRecords',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.pharmacyPurchaseRecords)
+app.post('/reports/pharmacy_daily',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.pharmacy_daily)
+app.post('/reports/pharmacy_monthly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.pharmacy_monthly)
+app.post('/reports/pharmacy_yearly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.pharmacy_yearly)
 
 module.exports = app

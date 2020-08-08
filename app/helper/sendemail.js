@@ -1,7 +1,7 @@
 var nodemailer = require('nodemailer');
 
 
-const sendemail = function(email,subject,message,type = 1){
+const sendemail = function(email,subject,message,type = 1,callback){
     // var transporter = nodemailer.createTransport({
     //     service: 'gmail',
     //     auth: {
@@ -30,14 +30,18 @@ const sendemail = function(email,subject,message,type = 1){
       
       if(type==1) mailOptions.text =  message
       if(type==2) mailOptions.html = message
-
+   
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
           console.log(error);
+          callback(0)
         } else {
           console.log('Email sent: ' + info.response);
+          callback(1)
         }
       });
+
+
 }
 
 module.exports = sendemail

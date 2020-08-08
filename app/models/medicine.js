@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     Medicine.belongsTo(models.Branch)
     Medicine.hasMany(models.Stockinitem)
     Medicine.hasMany(models.Stockout)
+    Medicine.hasMany(models.Billitem)
   };
 
   Medicine.loadscope = function(models){

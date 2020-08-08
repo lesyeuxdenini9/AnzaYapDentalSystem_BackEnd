@@ -1,4 +1,4 @@
-const { Medicine , Stockin , Stockinitem , Stockout, Transaction , Action, Treatment , Dentist} = require('../models/index')
+const { Medicine , Stockin , Stockinitem , Stockout, Transaction , Action, Treatment , Dentist , Billitem , Billing} = require('../models/index')
 const Sequelize = require('sequelize')
 const op = Sequelize.Op
 const literal = Sequelize.literal
@@ -162,13 +162,36 @@ class Medicine_ {
                                 required: true,
                             }
                         ]
+                    },
+                    {
+                        model: Billitem,
+                        required: false,
+                        include: [
+                            {
+                            model: Billing,
+                            required: true,
+                            attributes: ["billrefNo","createdAt","updatedAt","createdBy","modifiedBy"]
+                            },
+                            {
+                                model: Medicine,
+                                required: true,
+                                attributes: ["uom"]
+                            }
+                        ],
+                        where: {
+                            [op.and]: [
+                                literal(`DATE(Billitems.createdAt) >= '${String(start)}' AND DATE(Billitems.createdAt) <= '${String(end)}'`)
+                            ]
+                        },
                     }
                 ],
                 where: {
                     id: id
                 },
                 order: [
-                    [{model: Stockinitem},{model: Stockin},"date","DESC"]
+                    [{model: Stockinitem},{model: Stockin},"date","ASC"],
+                    [{model: Stockout},"createdAt","ASC"],
+                    [{model: Billitem},{model: Billing}, "createdAt","ASC"]
                 ]
             })
 

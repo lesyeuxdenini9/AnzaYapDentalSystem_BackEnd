@@ -2,7 +2,7 @@ const controller = {}
 const Sequelize = require('sequelize')
 const literal = Sequelize.literal
 const op = Sequelize.Op
-const { Billing , sequelize , Reservation } = require('../models/index')
+const { Billing , sequelize , Reservation , Dentist, User, Transaction } = require('../models/index')
 const { formatDate } = require('../helper/helper')
 
 controller.getData = async (req,res,next)=>{
@@ -63,6 +63,36 @@ controller.getData = async (req,res,next)=>{
         appointmenttoday: appointmenttoday,
         weeksales: last7date,
     })
+}
+
+
+controller.dentistTransaction = (req,res,next)=>{
+    const { branch } = req.params
+    Dentist.findAll({
+        include: [
+            {
+                model: Transaction,
+                required: false,
+                right: false,
+                where: {
+                    status: 0,
+                },
+                include: [
+                    {
+                        model: User,
+                        required: true,
+                        attributes: ["fullname","id"]
+                    }
+                ]
+            }
+        ],
+        where: {
+            branchId: branch
+        }
+    }).then((response)=>{
+        res.json({data: response})
+    })
+    .catch(err=>res.status(500).json(err)) 
 }
 
 module.exports = controller

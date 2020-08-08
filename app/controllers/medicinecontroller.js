@@ -35,7 +35,7 @@ controller.addstock = (req,res,next)=>{
         if(!response.status){
             res.json(response.err)
         }else{
-            const { branch, date, supplier , invoiceRef , items } = req.body
+            const { branch, date, supplier , invoiceRef , items , isPharmacy } = req.body
             let currentstocks = []
 
             items.forEach(async (item)=>{
@@ -59,7 +59,8 @@ controller.addstock = (req,res,next)=>{
                     date: date,
                     manufacturer: supplier,
                     invoiceRefno: invoiceRef,
-                    branchId: branch
+                    branchId: branch,
+                    isPharmacy: isPharmacy
                 },{transaction: t})
                
                 let updatestockref = await Stockin.update({
@@ -128,11 +129,15 @@ controller.save = (req,res,next)=>{
         'price': ['regex:/^\\d*(\\.\\d*)?$/','required','numeric'],
     }
 
-    validator(req.body,rules,{}).then(async (response)=>{
+    const message = {
+        "required.limit":"The Minimum field is required"
+    }
+
+    validator(req.body,rules,message).then(async (response)=>{
         if(!response.status){
             res.json(response.err)
         }else{
-            const { uom , branch , medicine , description , price, manufacturer , code , limit} = req.body
+            const { uom , branch , medicine , description , price, manufacturer , code , limit , type} = req.body
 
             const newmedicine = {
                 limitMin: limit,
@@ -143,6 +148,7 @@ controller.save = (req,res,next)=>{
                 price: price,
                 manufacturer: manufacturer,
                 code: code,
+                type: type,
             }
 
             const medicineInfo = await Medicine.create(newmedicine)
@@ -163,11 +169,15 @@ controller.update = (req,res,next)=>{
     const rules = {
         'medicine': 'required|string',
         'description': 'required|string',
-        'limit': 'required|numeric',
+        'limitMin': 'required|numeric',
         'price': ['regex:/^\\d*(\\.\\d*)?$/','required','numeric']
     }
 
-    validator(req.body,rules,{}).then(async (response)=>{
+    const message = {
+        "required.limitMin":"The Minimum field is required"
+    }
+
+    validator(req.body,rules,message).then(async (response)=>{
         if(!response.status){
             res.json(response.err)
         }else{

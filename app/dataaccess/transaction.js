@@ -1,4 +1,4 @@
-const { Medicine , Stockout , Healthcard, Dentist, Transaction, User , Treatment, Action , Teeth, ActionTeeth , Prescription , Prescriptitem , Billing, sequelize , Branch , Schedule} = require('../models/index')
+const { Medicine , Stockout , Healthcard, Dentist, Transaction, User , Treatment, Action , Teeth, ActionTeeth , Prescription , Prescriptitem , Billing, Billitem, sequelize , Branch , Schedule} = require('../models/index')
 const Sequelize = require('sequelize')
 const dentist = require('./dentist')
 const { where } = require('sequelize')
@@ -180,13 +180,57 @@ class Transaction_ {
         })
     }
 
+    getPastListPharmacy(data){
+        return new Promise(async(resolve,reject)=>{
+                let whereclause = {}
+                if(data.refno != ""){
+                    whereclause.billrefNo = {
+                        [op.like] : `%${data.refno}`
+                    }
+                    data.page = 1
+                }
+
+                whereclause.branchId = data.branch
+                whereclause.isPharmacy = 1
+                
+
+                let result = await Billing.findAll({
+                    include: [
+                        {
+                            model: Billitem,
+                            required: true,
+                            attributes: ["amount"]
+                        }
+                    ],
+                    attributes:{
+                        exclude: ["TransactionId","BranchId","UserId"]
+                    },
+                    where: whereclause,
+                    offset: (data.page-1) * data.limit,
+                    limit: data.limit,  
+                    order: [
+                        ["id","DESC"]
+                    ],
+                  
+                })
+
+                resolve(result)
+
+        })
+    }
+    
+
     viewBill(idno){
         return new Promise(async(resolve,reject)=>{
             let data = await Billing.findOne({
                 include: [
                     {
+                        model: Billitem,
+                        required: false,
+                    },
+                    {
                         model: User,
-                        required: true,
+                        required: false,
                         attributes: ["fullname","firstname","middlename","lastname","email","contact","address"]
                     },
                     {
@@ -194,7 +238,7 @@ class Transaction_ {
                         required: true,
                     },{
                         model:Transaction,
-                        required:true,
+                        required:false,
                         include: [
                             {
                                 model: Treatment,
@@ -257,6 +301,11 @@ class Transaction_ {
                     {
                         model: Dentist,
                         required: false,
+                        attributes: ["fullname"]
+                    },
+                    {
+                        model: User,
+                        required: true,
                         attributes: ["fullname"]
                     }
                 ],

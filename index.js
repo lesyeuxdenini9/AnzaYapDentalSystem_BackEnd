@@ -5,7 +5,7 @@ const  app = express()
 const cors = require('cors')
 const corsOptions = {
       // origin: '*',
-      origin: ['https://anza-yap-dental-clinic.herokuapp.com'],
+      origin: ['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com','https://anza-yap-dental-clinic.herokuapp.com:8888','http://localhost'],
       methods: ['GET','POST','OPTIONS','PUT','PATCH','DELETE'],
       allowedHeaders: ['Origin','X-Requested-With','Content-Type','Accept','Authorization'],
       optionsSuccessStatus: 200,
@@ -64,6 +64,7 @@ io.origins((origin, callback) => {
   if (origin !== 'http://localhost:8081') {
       return callback('origin not allowed', false);
   }
+  callback(null, true);
 });
 
   
@@ -83,6 +84,10 @@ io.on('connection', (socket)=>{
 
   socket.on('reservationCreated',(data)=>{
     socket.broadcast.emit('updateReservation',(data))
+  })
+
+  socket.on('updatedentistTransaction',()=>{
+      socket.broadcast.emit('dentistTransaction')
   })
 
 

@@ -21,9 +21,10 @@ controller.login = async (req,res,next)=>{
         if(!response.status){
            res.send(response.err)
         }else{
-        const { email , password } = req.body
+        const { email , password , loginsource} = req.body
         try {
-            let user = await User.scope("active").findOne({where: {email: email}})
+ 
+            let user = loginsource == 'web' ? await User.scope("active").findOne({where: {email: email}}) : await User.scope("active").findOne({where: {usertype: 2, email: email}})
             if(!user){
                 res.status(401).json({msg: 'No user found'})
                 // res.json({error: 'No user found'})
@@ -139,24 +140,36 @@ controller.sendResetLink = (req,res,next)=>{
                 }
             })
 
-           const tokensave = await Resettoken.create({
-               userId: user.id,
-               email: user.email,
-               token: `${generate_token(100)}${user.id}`,
-           })
+            if(user){
+                const tokensave = await Resettoken.create({
+                    userId: user.id,
+                    email: user.email,
+                    token: `${generate_token(100)}${user.id}`,
+                })
+     
+                const messagehtml = `<div style='height:50px;width:100%;background:#083D55'>
+                <span style="font-size:20pt;padding: 30px 0px 0px 10px; font-weight:bold;"><span style="color:#4167D6">Anza</span><span style="color:white">-</span><span style="color:orange;">Yap</span> <small style="color:white">Dental Clinic</small></span>
+                </div>
+                <h1>Hi ${user.firstname} ${user.middlename} ${user.lastname}</h1>
+                     <hr/>
+                     <p>You can now Change your password by clicking this link</p>
+                     <p>link: <a href="${process.env.FRONTEND_URL}/setpassword/${tokensave.token}">Reset link</a></p>
+                 `
+                sendemail(email,"Reset Password",messagehtml,2,(response)=>{
+                    console.log(response)
+                    if(response == 1){
+                        res.json({type: "success", msg: "Check Reset link in your email"})
+                    }else{
+                        res.json({type: "error", msg: "Something went wrong!"})
+                    }
+                })
+               
+     
+            }else{
+                res.json({type: "warning",msg: "No User Found"})
+            }
 
-           const messagehtml = `<div style='height:50px;width:100%;background:#083D55'>
-           <span style="font-size:20pt;padding: 30px 0px 0px 10px; font-weight:bold;"><span style="color:#4167D6">Anza</span><span style="color:white">-</span><span style="color:orange;">Yap</span> <small style="color:white">Dental Clinic</small></span>
-           </div>
-           <h1>Hi ${user.firstname} ${user.middlename} ${user.lastname}</h1>
-                <hr/>
-                <p>You can now Change your password by clicking this link</p>
-                <p>link: <a href="${process.env.FRONTEND_URL}/setpassword/${tokensave.token}">Reset link</a></p>
-            `
-            sendemail(email,"Reset Password",messagehtml,2)
-
-            res.json({data: "success"})
-
+       
         }
 
     })
