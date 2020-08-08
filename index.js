@@ -61,7 +61,7 @@ let io = require('socket.io')(http)
 // io.set('origins', 'https://anza-yap-dental-clinic.herokuapp.com');
 
 io.origins((origin, callback) => {
-  if (origin !== 'http://localhost:8081') {
+  if (origin !== 'https://anza-yap-dental-clinic.herokuapp.com') {
       return callback('origin not allowed', false);
   }
   callback(null, true);
