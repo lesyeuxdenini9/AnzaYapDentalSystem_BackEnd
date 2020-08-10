@@ -5,11 +5,17 @@ const op = Sequelize.Op
 const { Billing , sequelize , Reservation , Dentist, User, Transaction } = require('../models/index')
 const { formatDate } = require('../helper/helper')
 
+
 controller.getData = async (req,res,next)=>{
     const { branch } = req.params
-    const todaysales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE DATE(createdAt) = DATE(NOW()) AND branchId = ?",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
-    const yearsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND branchId = ?",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
-    const monthsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND MONTH(createdAt) = MONTH(NOW()) AND branchId = ?",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
+    const todaysales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE DATE(createdAt) = DATE(NOW()) AND branchId = ? AND isPharmacy = 0",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
+    const yearsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND branchId = ?  AND isPharmacy = 0",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
+    const monthsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND MONTH(createdAt) = MONTH(NOW()) AND branchId = ?  AND isPharmacy = 0",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
+   
+   
+    const P_todaysales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE DATE(createdAt) = DATE(NOW()) AND branchId = ? AND isPharmacy = 1",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
+    const P_yearsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND branchId = ?  AND isPharmacy = 1",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
+    const P_monthsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND MONTH(createdAt) = MONTH(NOW()) AND branchId = ?  AND isPharmacy = 1",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
     const appointmenttoday = await Reservation.count({
         where: {
             [op.and]: [
@@ -25,21 +31,25 @@ controller.getData = async (req,res,next)=>{
            
         }
     })
-    const lastweeksales = await sequelize.query("SELECT SUM(payment) as total,DATE(createdAt) as date FROM billings WHERE DATE(createdAt) BETWEEN DATE(NOW()-INTERVAL 7 DAY) AND DATE(NOW()-INTERVAL 1 DAY) AND branchId = ? GROUP BY DATE(createdAt)",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
+    const lastweeksales = await sequelize.query("SELECT SUM(payment) as total,date,isPharmacy FROM billings WHERE date BETWEEN DATE(NOW()-INTERVAL 7 DAY) AND DATE(NOW()-INTERVAL 1 DAY) AND branchId = ? GROUP BY date,isPharmacy",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
     const last7date = []
     const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
     for(let x = 0 ; x<= 7 ; x++){
         let datenow = new Date()
         let otherdate = datenow.setDate(datenow.getDate()-x)
-        last7date.push({date: formatDate(otherdate), sale: 0, day: dayNames[new Date(otherdate).getDay()]})
+        last7date.push({date: formatDate(otherdate), pharmacy: 0, treatment: 0, day: dayNames[new Date(otherdate).getDay()]})
     }
 
   
 
     lastweeksales.forEach((sale)=>{
         last7date.filter((last)=>{
-            if(last.date == sale.date){
-                last.sale = sale.total
+            if(last.date == sale.date && sale.isPharmacy == 0){
+                last.treatment = sale.total
+            }
+
+             if(last.date == sale.date && sale.isPharmacy == 1){
+                last.pharmacy = sale.total
             }
         })
     })
@@ -60,6 +70,9 @@ controller.getData = async (req,res,next)=>{
         todaysales: todaysales[0].total != null ? todaysales[0].total : 0,
         yearsales: yearsales[0].total != null ? yearsales[0].total : 0,
         monthsales: monthsales[0].total != null ? monthsales[0].total : 0,
+        ptodaysales: P_todaysales[0].total != null ? P_todaysales[0].total : 0,
+        pyearsales: P_yearsales[0].total != null ? P_yearsales[0].total : 0,
+        pmonthsales: P_monthsales[0].total != null ? P_monthsales[0].total : 0,
         appointmenttoday: appointmenttoday,
         weeksales: last7date,
     })
