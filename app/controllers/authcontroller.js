@@ -177,4 +177,28 @@ controller.sendResetLink = (req,res,next)=>{
     
 }
 
+controller.pushnotiftoken = (req,res,next)=>{
+    const { email , token } = req.body
+    console.log(email)
+    console.log(token)
+
+    User.update({pushnotiftoken: ''},{
+        where: {
+            email: {
+                [op.ne]: email
+            },
+            usertype: 2,
+            pushnotiftoken: token
+        }
+    }).then(response=> User.update({
+        pushnotiftoken: token
+    },{
+        where: {
+            email: email
+        }
+    })).then(response=>res.json({data: response}))
+    .catch(err=>res.status(500).json(err))
+}
+
+
 module.exports = controller
