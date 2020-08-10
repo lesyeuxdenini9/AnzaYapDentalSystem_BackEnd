@@ -6,7 +6,8 @@ const sendemail = require('../helper/sendemail')
 const jwt = require('jsonwebtoken')
 const { sequelize, User , Refreshtoken , Resettoken } = require('../models/index')
 const RefreshtokenData = require('../dataaccess/refreshtoken')
-const { response } = require('express')
+const Sequelize = require('sequelize')
+const op = Sequelize.Op
 const controller = {}
 
 
