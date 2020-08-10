@@ -15,8 +15,6 @@ app.get('/test',PassportAuthenticate(passport),checkisAuthenticated,(req,res,nex
 
 app.post('/sendResetLink',authcontroller.sendResetLink)
 app.post('/changepass',authcontroller.changepass)
-
-
-
+app.post('/pushnotiftoken',PassportAuthenticate(passport),checkisAuthenticated,authcontroller.pushnotiftoken)
 
 module.exports = app
