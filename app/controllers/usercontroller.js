@@ -255,7 +255,7 @@ controller.changepic = async (req,res,next)=>{
     form.parse(req, (err, fields, files)=> {
         const imagename = files.imgfile ? files.imgfile.name : null
        
-        let finalimagename = `${userid}_${imagename}`
+        let finalimagename =  imagename == "blob" ? `${userid}_${imagename}_profile.png` : `${userid}_${imagename}`
 
         if(imagename != null){
             var oldpath = files.imgfile.path
@@ -266,7 +266,7 @@ controller.changepic = async (req,res,next)=>{
 
             fs.readFile(oldpath,(err,data)=>{
                 if(err) throw err
-                fs.writeFile(`${newpath}/${userid}_${files.imgfile.name}`,data,(err)=>{
+                fs.writeFile(`${newpath}/${finalimagename}`,data,(err)=>{
                     if(err) throw err
 
                         fs.unlink(oldpath, function (err) {
