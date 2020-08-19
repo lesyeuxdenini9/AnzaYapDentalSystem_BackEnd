@@ -10,6 +10,9 @@ const { response } = require('express')
 var path = require('path')
 const dentist = require('../dataaccess/dentist')
 const branch = require('../dataaccess/branch')
+const Sequelize = require('sequelize')
+const op = Sequelize.Op
+const literal = Sequelize.literal
 
 controller.create = (req,res,next)=>{
     const rules = {
@@ -950,6 +953,51 @@ controller.list = (req,res,next) => {
         .then((response)=>res.json({data: response}))
         .catch(err=>res.json(err))
 }
+
+controller.getNextAppointment = async (req,res,next)=>{
+    const userinfo = await req.user
+
+
+    let expired = await Reservation.count({
+        where: {
+            userId: userinfo.id,
+            date: {
+                [op.lt]: literal("DATE(NOW())")
+            },
+            status: {
+                [op.lt]: 2
+            }
+        }
+    })
+
+    if(expired > 0) await Reservation.update({
+        status: 3
+    },{
+        where: {
+            userId: userinfo.id,
+            date: {
+                [op.lt]: literal("DATE(NOW())")
+            },
+            status: {
+                [op.lt]: 2
+            }
+        }
+    })
+
+    let nextappointment = await Reservation.findAll({
+        where: {
+            userId: userinfo.id,
+            status: 1,
+            date: {
+                [op.gte]:  literal("DATE(NOW())")
+            }
+        }
+    })
+
+    res.json({data: nextappointment})
+
+}
+
 
 
 
