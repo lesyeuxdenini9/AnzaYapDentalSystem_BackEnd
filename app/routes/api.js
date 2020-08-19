@@ -130,6 +130,8 @@ app.delete('/reservation/deleteReservation/(:idno)',PassportAuthenticate(passpor
 app.post('/reservation/list',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.list)
 app.post('/reservation/changeTimeReservation',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.changeTimeReservation)
 app.post('/reservation/createWalkInReservation',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.createWalkInReservation)
+app.post('/reservation/getNextAppointment',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.getNextAppointment)
+
 
 app.get('/notification/get/(:admin)',PassportAuthenticate(passport),checkisAuthenticated,notificationcontroller.getNotification)
 app.patch('/notification/markasRead/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,notificationcontroller.markasRead)
