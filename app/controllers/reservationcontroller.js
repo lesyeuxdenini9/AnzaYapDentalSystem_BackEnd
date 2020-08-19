@@ -3,7 +3,7 @@ const validator = require('../helper/validator')
 const ReservationData = require('../dataaccess/reservation')
 const UserData = require('../dataaccess/user')
 const sendemail = require('../helper/sendemail')
-const { Reservation,Treatment , Notification, sequelize , Transaction } = require('../models/index')
+const { Reservation,Treatment , Notification, sequelize , Dentist, Branch, Transaction } = require('../models/index')
 const { maskzero } = require('../helper/helper')
 const { format12Hour, formatHour , formatraw12Hour } = require('../helper/helper')
 const { response } = require('express')
@@ -984,7 +984,16 @@ controller.getNextAppointment = async (req,res,next)=>{
         }
     })
 
-    let nextappointment = await Reservation.findAll({
+     let nextappointment = await Reservation.findAll({
+        include: [{
+            model: Dentist,
+            required: true,
+            attributes: ['fullname'],
+        },{
+            model: Branch,
+            required: true,
+            attributes: ['branch']
+        }],
         where: {
             userId: userinfo.id,
             status: 1,
@@ -993,7 +1002,7 @@ controller.getNextAppointment = async (req,res,next)=>{
             }
         }
     })
-
+     
     res.json({data: nextappointment})
 
 }
