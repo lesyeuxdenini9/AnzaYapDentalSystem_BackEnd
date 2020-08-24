@@ -5,7 +5,7 @@ const  app = express()
 const cors = require('cors')
 const corsOptions = {
       // origin: '*',
-      origin: ['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com','https://anza-yap-dental-clinic.herokuapp.com:8888','http://localhost'],
+      origin: ['http://localhost:8081','https://anza-yap-dental-clinic.herokuapp.com','https://anza-yap-dental-clinic.herokuapp.com:8888','http://localhost','capacitor://localhost'],
       methods: ['GET','POST','OPTIONS','PUT','PATCH','DELETE'],
       allowedHeaders: ['Origin','X-Requested-With','Content-Type','Accept','Authorization'],
       optionsSuccessStatus: 200,
