@@ -444,7 +444,8 @@ controller.changeReservationDate = async (req,res,next)=>{
                                                     endtime: newend,
                                                     date: date,
                                                     Start: start,
-                                                    End: end
+                                                    End: end,
+                                                    isResched: 1,
                                                 },{
                                                     where: {
                                                         id: info.id
@@ -839,6 +840,7 @@ controller.changeTimeReservation = async (req,res,next)=>{
             endtime: event.end,
             Start: formatHour(event.start),
             End: formatHour(event.end),
+            isResched: 1,
         },{
             where: {
                 id: event.id
@@ -948,8 +950,8 @@ controller.deleteReservation = (req,res,next)=>{
 }
 
 controller.list = (req,res,next) => {
-    const {start , end , reservationNo , branch } = req.body
-    ReservationData.list(start,end,reservationNo,branch)
+    const {start , end , reservationNo , branch , dentist , status } = req.body
+    ReservationData.list(start,end,reservationNo,branch, dentist , status)
         .then((response)=>res.json({data: response}))
         .catch(err=>res.json(err))
 }
@@ -996,7 +998,9 @@ controller.getNextAppointment = async (req,res,next)=>{
         }],
         where: {
             userId: userinfo.id,
-            status: 1,
+            status: {
+                [op.or]: [0,1]
+            },
             date: {
                 [op.gte]:  literal("DATE(NOW())")
             }

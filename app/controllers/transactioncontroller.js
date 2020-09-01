@@ -34,11 +34,11 @@ controller.saveMedRemarks = (req,res,next)=>{
 }
 
 controller.getRecords = async (req,res,next)=>{
-    const { start , end , transactionNo , branch } = req.body
+    const { start , end , transactionNo , branch , dentist, status } = req.body
     const userinfo = await req.user
     let userid = userinfo.id
     if(userinfo.usertype != 2) userid = "all"
-    TransactionData.getRecords(start,end,transactionNo,branch,userid).then(response=>res.json({data: response})).catch(err=>res.status(500).json(err))
+    TransactionData.getRecords(start,end,transactionNo,branch,userid , dentist, status).then(response=>res.json({data: response})).catch(err=>res.status(500).json(err))
 }
 
 controller.viewBill = (req,res,next)=>{
@@ -894,7 +894,7 @@ controller.createBillPharmarcy = (req,res,next)=>{
                 let billitems = items.map((item)=>{
                     return {
                         billingId: createbill.id,
-                        item: item.medicine,
+                        item: `${item.medicine} ( ${item.brand} )`,
                         description: item.description,
                         medicineId: item.id,
                         qty: parseFloat(item.quantity),

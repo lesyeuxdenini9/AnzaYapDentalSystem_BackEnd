@@ -99,7 +99,7 @@ controller.pharmacy_daily = async (req,res,next)=>{
             LEFT JOIN billings b ON b.id = bi.billingId
             WHERE b.branchId = ${branch} AND ( b.date >= '${start}' AND b.date <= '${end}')
             GROUP BY bi.medicineId
-            ORDER BY totalcount DESC LIMIT 10`
+            ORDER BY totalcount DESC`
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
     res.json({graph: salesdaily, serviceMostavail: servicegraphAvail})
@@ -124,7 +124,7 @@ controller.pharmacy_monthly = async (req,res,next)=>{
             WHERE b.branchId = ${branch} AND ( MONTH(b.date) >= '${startmonth}' AND YEAR(b.date) >= '${startyear}')
             AND  ( MONTH(b.date) <= '${endmonth}' AND YEAR(b.date) <= '${endyear}')
             GROUP BY bi.medicineId
-            ORDER BY totalcount DESC LIMIT 10`
+            ORDER BY totalcount DESC`
 
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
@@ -147,7 +147,7 @@ controller.pharmacy_yearly = async (req,res,next)=>{
             LEFT JOIN billings b ON b.id = bi.billingId
             WHERE b.branchId = ${branch} AND ( YEAR(b.date) >= '${startyear}' AND YEAR(b.date) <= '${endyear}')
             GROUP BY bi.medicineId
-            ORDER BY totalcount DESC LIMIT 10`
+            ORDER BY totalcount DESC`
 
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
@@ -170,7 +170,7 @@ controller.sales_daily = async (req,res,next)=>{
              LEFT JOIN services s ON s.id = t.serviceId 
              WHERE tr.branchId = ${branch} AND ( tr.transactionDate >= '${start}' AND tr.transactionDate <= '${end}')
              GROUP BY t.serviceId
-             ORDER BY totalcount DESC LIMIT 5`
+             ORDER BY totalcount DESC`
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
     query = `SELECT t.serviceId,s.service,SUM(b.payment) as totalearn 
@@ -180,7 +180,7 @@ controller.sales_daily = async (req,res,next)=>{
              LEFT JOIN services s ON s.id = t.serviceId 
              WHERE b.branchId = ${branch} AND ( b.date >= '${start}' AND b.date <= '${end}')
              GROUP BY t.serviceId
-             ORDER BY totalearn DESC LIMIT 5`
+             ORDER BY totalearn DESC`
 
     let servicegrapEarn = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
@@ -206,7 +206,7 @@ controller.sales_monthly = async (req,res,next)=>{
             WHERE tr.branchId = ${branch} AND ( MONTH(tr.transactionDate) >= '${startmonth}' AND YEAR(tr.transactionDate) >= '${startyear}')
             AND  ( MONTH(tr.transactionDate) <= '${endmonth}' AND YEAR(tr.transactionDate) <= '${endyear}')
             GROUP BY t.serviceId
-            ORDER BY totalcount DESC LIMIT 5`
+            ORDER BY totalcount DESC`
 
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
@@ -230,7 +230,7 @@ controller.sales_yearly = async (req,res,next)=>{
             LEFT JOIN services s ON s.id = t.serviceId 
             WHERE tr.branchId = ${branch} AND ( YEAR(tr.transactionDate) >= '${startyear}' AND YEAR(tr.transactionDate) <= '${endyear}')
             GROUP BY t.serviceId
-            ORDER BY totalcount DESC LIMIT 5`
+            ORDER BY totalcount DESC`
 
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 

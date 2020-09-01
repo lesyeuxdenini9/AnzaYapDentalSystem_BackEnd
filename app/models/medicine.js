@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.INTEGER,
     uom: DataTypes.STRING,
     limitMin: DataTypes.FLOAT,
+    scientificName: DataTypes.TEXT,
+    brand: DataTypes.STRING,
   }, {});
   Medicine.associate = function(models) {
     // associations can be defined here

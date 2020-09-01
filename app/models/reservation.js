@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     transactionId: DataTypes.INTEGER,
     branchId: DataTypes.INTEGER,
     Start: DataTypes.STRING,
-    End: DataTypes.STRING
+    End: DataTypes.STRING,
+    isResched: DataTypes.INTEGER,
   }, {});
   Reservation.associate = function(models) {
     // associations can be defined here

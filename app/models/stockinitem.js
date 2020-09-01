@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     medicineId: DataTypes.INTEGER,
     medicine: DataTypes.STRING,
     qty: DataTypes.FLOAT,
-    uom: DataTypes.STRING
+    uom: DataTypes.STRING,
+    ExpirationDate: DataTypes.DATEONLY
   }, {});
   Stockinitem.associate = function(models) {
     // associations can be defined here

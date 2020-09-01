@@ -267,8 +267,11 @@ class Transaction_ {
         })
     }
 
-    getRecords(start,end,transactionNo,branch,userid){
+    getRecords(start,end,transactionNo,branch,userid,dentist,status){
         let whereclause = {}
+
+        console.log(dentist)
+        console.log(status)
 
         if(transactionNo != ""){
             whereclause.transactionNo = {
@@ -288,6 +291,9 @@ class Transaction_ {
                     }
                 ]
             }
+
+            if(dentist != "All") whereclause.dentistId = dentist
+            if(status != "All") whereclause.status = parseInt(status)
             
         }
 

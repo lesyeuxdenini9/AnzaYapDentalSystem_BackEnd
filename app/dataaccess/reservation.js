@@ -240,7 +240,7 @@ class Reservation_ {
         })
     }
 
-    list(start,end,reservationNo,branch){
+    list(start,end,reservationNo,branch, dentist, status){
 
         let whereclause = {}
 
@@ -262,13 +262,19 @@ class Reservation_ {
                     }
                 ]
             }
+
+            if(dentist != "All") whereclause.dentistId = dentist
+            if(status != "All") whereclause.status = parseInt(status)
             
         }
 
-        whereclause.status = {
-            [op.ne]: 0
+        if(status == "All"){
+            whereclause.status = {
+                [op.ne]: 0
+            }
+    
         }
-
+  
         whereclause.branchId = branch
 
 

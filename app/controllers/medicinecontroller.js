@@ -78,7 +78,8 @@ controller.addstock = (req,res,next)=>{
                         medicineId: item.id,
                         medicine: item.medicine,
                         qty: item.qty,
-                        uom: item.uom
+                        uom: item.uom,
+                        ExpirationDate: item.expirationDate,
                     }
                 })
 
@@ -126,6 +127,7 @@ controller.save = (req,res,next)=>{
         'medicine': 'required|string',
         'description': 'required|string',
         'limit': 'required|numeric',
+        'brand': 'required|string',
         'price': ['regex:/^\\d*(\\.\\d*)?$/','required','numeric'],
     }
 
@@ -137,7 +139,7 @@ controller.save = (req,res,next)=>{
         if(!response.status){
             res.json(response.err)
         }else{
-            const { uom , branch , medicine , description , price, manufacturer , code , limit , type} = req.body
+            const { uom , branch , medicine , description , price, manufacturer , code , limit , type , scientific , brand } = req.body
 
             const newmedicine = {
                 limitMin: limit,
@@ -149,6 +151,8 @@ controller.save = (req,res,next)=>{
                 manufacturer: manufacturer,
                 code: code,
                 type: type,
+                scientificName: scientific,
+                brand: brand, 
             }
 
             const medicineInfo = await Medicine.create(newmedicine)
@@ -170,6 +174,7 @@ controller.update = (req,res,next)=>{
         'medicine': 'required|string',
         'description': 'required|string',
         'limitMin': 'required|numeric',
+        'brand': 'required|string',
         'price': ['regex:/^\\d*(\\.\\d*)?$/','required','numeric']
     }
 
@@ -182,7 +187,7 @@ controller.update = (req,res,next)=>{
             res.json(response.err)
         }else{
             const idno = req.params.idno
-            const { medicine , description , price, manufacturer, stocks , code , limit} = req.body
+            const { medicine , description , price, manufacturer, stocks , code , limit , scientificName , brand } = req.body
 
             const newmedicine = {
                 limitMin: limit,
@@ -192,6 +197,8 @@ controller.update = (req,res,next)=>{
                 manufacturer: manufacturer,
                 code: code,
                 stocks: stocks, // temp update of stocks should rely on add stocks and reduce stocks module
+                brand: brand,
+                scientificName: scientificName,
             }
 
             let updateresult = await Medicine.update(newmedicine, {where: {id: idno}})
