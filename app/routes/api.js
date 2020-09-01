@@ -152,5 +152,8 @@ app.post('/reports/pharmacyPurchaseRecords',PassportAuthenticate(passport),check
 app.post('/reports/pharmacy_daily',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.pharmacy_daily)
 app.post('/reports/pharmacy_monthly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.pharmacy_monthly)
 app.post('/reports/pharmacy_yearly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.pharmacy_yearly)
+app.post('/reports/appointment_daily',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.appointment_daily)
+app.post('/reports/appointment_monthly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.appointment_monthly)
+app.post('/reports/appointment_yearly',PassportAuthenticate(passport),checkisAuthenticated,reportcontroller.appointment_yearly)
 
 module.exports = app
