@@ -215,4 +215,9 @@ controller.search = (req,res,next)=>{
 }
 
 
+controller.stockinfo = (req,res,next)=>{
+    const { refno , medid } = req.body
+    MedicineData.stockinfo(refno,medid).then(response=>res.json({data: response})).catch(err=>res.status(500).json(err))
+}
+
 module.exports = controller

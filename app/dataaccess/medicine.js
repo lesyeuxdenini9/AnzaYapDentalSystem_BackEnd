@@ -198,7 +198,31 @@ class Medicine_ {
             resolve(data)
         })
     }
+
+    stockinfo(refno,medid){
+        return new Promise((resolve,reject)=>{
+            let data = Stockin.findOne({
+                include: [
+                    {
+                        model: Stockinitem,
+                        where: {
+                            medicineId: medid,
+                        }
+                    }
+                ],  
+                where: {
+                    refno:{
+                        [op.like]:`%${refno}%`
+                    }
+                }
+            })
+
+            resolve(data)
+        })
+    }
   
 }
+
+
 
 module.exports = new Medicine_()

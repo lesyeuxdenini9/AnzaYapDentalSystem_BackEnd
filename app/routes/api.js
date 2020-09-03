@@ -63,6 +63,7 @@ app.post(`/medicine/addstock`,PassportAuthenticate(passport),checkisAuthenticate
 app.post('/medicine/getStocksin',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.getStocksin)
 app.post('/medicine/getInfo',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.getInfo)
 app.post('/medicine/search',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.search)
+app.post('/medicine/stockinfo',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.stockinfo)
 
 
 app.post('/branch/save',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.save)

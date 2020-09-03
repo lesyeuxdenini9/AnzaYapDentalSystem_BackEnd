@@ -81,7 +81,7 @@ controller.getData = async (req,res,next)=>{
 
 controller.dentistTransaction = (req,res,next)=>{
     const { branch } = req.params
-    Dentist.findAll({
+    Dentist.scope("active").findAll({
         include: [
             {
                 model: Transaction,
