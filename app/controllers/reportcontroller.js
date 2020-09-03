@@ -96,9 +96,10 @@ controller.pharmacy_daily = async (req,res,next)=>{
 
     let salesdaily = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+    query = `SELECT i.uom,bi.item,bi.description,SUM(bi.qty) as totalcount
             FROM billitems bi
             LEFT JOIN billings b ON b.id = bi.billingId
+            LEFT JOIN medicines i ON bi.medicineId = i.id
             WHERE b.branchId = ${branch} AND ( b.date >= '${start}' AND b.date <= '${end}')
             GROUP BY bi.medicineId
             ORDER BY totalcount DESC`
@@ -120,9 +121,10 @@ controller.pharmacy_monthly = async (req,res,next)=>{
                 ORDER BY YEAR(date) ASC,MONTH(date) ASC`
     let salesmonthly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+    query = `SELECT i.uom,bi.item,bi.description,SUM(bi.qty) as totalcount
             FROM billitems bi
             LEFT JOIN billings b ON b.id = bi.billingId
+            LEFT JOIN medicines i ON bi.medicineId = i.id
             WHERE b.branchId = ${branch} AND ( MONTH(b.date) >= '${startmonth}' AND YEAR(b.date) >= '${startyear}')
             AND  ( MONTH(b.date) <= '${endmonth}' AND YEAR(b.date) <= '${endyear}')
             GROUP BY bi.medicineId
@@ -144,9 +146,10 @@ controller.pharmacy_yearly = async (req,res,next)=>{
                  ORDER BY YEAR(date) ASC`
     let salesyearly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+    query = `SELECT i.uom,bi.item,bi.description,SUM(bi.qty) as totalcount
             FROM billitems bi
             LEFT JOIN billings b ON b.id = bi.billingId
+            LEFT JOIN medicines i ON bi.medicineId = i.id
             WHERE b.branchId = ${branch} AND ( YEAR(b.date) >= '${startyear}' AND YEAR(b.date) <= '${endyear}')
             GROUP BY bi.medicineId
             ORDER BY totalcount DESC`
