@@ -80,6 +80,41 @@ Validator.registerAsync('uniqueDentist', async (value,  attribute, req , passes)
 });
 
 
+Validator.registerAsync('allowedStartTimeCheck', async (value,  attribute, req , passes) => {
+    if (!attribute) throw new Error('Specify Requirements i.e fieldName: allowedStartTime:table,column,date,dentist');
+    let attArr = attribute.split(",");
+    if (attArr.length !== 5) throw new Error(`Invalid format for validation rule on ${attribute}`);
+    const { 0: table, 1: column , 2: date, 3: dentist , 4: refno} = attArr;
+    let msg = (column == "starttime") ? `${column} is conflict with other schedule `: `${column} already in use`
+
+    let checkreservation = await Reservation.count({where: literal(`('${value}:00' BETWEEN TIME(starttime) AND TIME(endtime)) AND (status = 1 OR status = 4) AND id != '${refno}' AND date = '${date}' AND dentistID = ${parseInt(dentist)}`)})
+    if(checkreservation>=1){
+        passes(false, msg)
+    }else{
+        passes(true)
+        return
+    }
+});
+
+
+Validator.registerAsync('allowedEndTimeCheck', async (value,  attribute, req , passes) => {
+    if (!attribute) throw new Error('Specify Requirements i.e fieldName: allowedEndTime:table,column,date,dentist');
+    let attArr = attribute.split(",");
+    if (attArr.length !== 5) throw new Error(`Invalid format for validation rule on ${attribute}`);
+    const { 0: table, 1: column , 2: date, 3: dentist , 4: refno} = attArr;
+    let msg = (column == "endtime") ? `${column} is conflict with other schedule `: `${column} already in use`
+
+    let checkreservation = await Reservation.count({where: literal(`('${value}:00' BETWEEN TIME(starttime) AND TIME(endtime)) AND (status = 1 OR status = 4) AND id != '${refno}' AND date = '${date}' AND dentistID = ${parseInt(dentist)}`)})
+    if(checkreservation>=1){
+        passes(false, msg)
+    }else{
+        passes(true)
+        return
+    }
+});
+
+
+
 
 Validator.registerAsync('allowedStartTime', async (value,  attribute, req , passes) => {
     if (!attribute) throw new Error('Specify Requirements i.e fieldName: allowedStartTime:table,column,date,dentist');
