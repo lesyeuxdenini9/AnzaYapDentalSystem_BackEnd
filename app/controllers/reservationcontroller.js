@@ -427,9 +427,14 @@ controller.changeReservationDate = async (req,res,next)=>{
 
             req.body.start = formatHour(req.body.start)
             req.body.end = formatHour(req.body.end)
+            // const rules2 = {
+            //     "start": `allowedStartTime:reservations,starttime,${req.body.date},${req.body.dentist}`,
+            //     "end": `allowedEndTime:reservations,endtime,${req.body.date},${req.body.dentist}|allowedMaxEndTime:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.start}`,
+            // }
+
             const rules2 = {
-                "start": `allowedStartTime:reservations,starttime,${req.body.date},${req.body.dentist}`,
-                "end": `allowedEndTime:reservations,endtime,${req.body.date},${req.body.dentist}|allowedMaxEndTime:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.start}`,
+                "start": `allowedStartTimeCheck:reservations,starttime,${req.body.date},${req.body.dentist},${req.body.refno}`,
+                "end": `allowedEndTimeCheck:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.refno}|allowedMaxEndTime:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.start}`,
             }
 
             validator(req.body,rules2,{}).then(async (response)=>{
@@ -446,6 +451,7 @@ controller.changeReservationDate = async (req,res,next)=>{
                                                     Start: start,
                                                     End: end,
                                                     isResched: 1,
+                                                    dentistId: dentist,
                                                 },{
                                                     where: {
                                                         id: info.id
