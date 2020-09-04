@@ -409,7 +409,7 @@ controller.changeReservationDate = async (req,res,next)=>{
     req.body.maxTime = maxt
 
     const rules = {
-        "date": "required|date|after:curdate",
+        "date": "required|date|after_or_equal:curdate",
         "start": `required|date|after_or_equal:minTime`,
         "end": 'required|date|after:start|before_or_equal:maxTime'
     }
