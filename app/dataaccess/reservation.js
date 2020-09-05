@@ -57,7 +57,7 @@ class Reservation_ {
                         model: Transaction.scope(["active"]),
                         required: false,
                     },{
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         required: false,
                         include: [
                             {
@@ -130,7 +130,6 @@ class Reservation_ {
             }
         }
         
-        console.log(whereclause)
         return new Promise(async (resolve,reject)=>{
             let data = await Reservation.findAll({
                 include: [
@@ -140,7 +139,7 @@ class Reservation_ {
                         required: true, 
                     },
                     {
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         required: false,
                     },
                     {
@@ -183,7 +182,7 @@ class Reservation_ {
                         required: true, 
                     },
                     {
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         required: false,
                         include: [
                             {
@@ -294,7 +293,7 @@ class Reservation_ {
                         model: Transaction.scope(["active"]),
                         required: false,
                     },{
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         require: false,
                     }
                 ],
