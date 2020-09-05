@@ -242,6 +242,7 @@ class Transaction_ {
                         include: [
                             {
                                 model: Treatment,
+                                where: { archive: 0},
                                 required: false,
                             },{
                                 model: Billing,
