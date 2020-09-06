@@ -19,7 +19,7 @@ controller.create = (req,res,next)=>{
         type: "required",
         start: "required|string",
         dentist: "required",
-        // servicelist: "required|array"
+        servicelist: "required|array"
     }
 
     const message = {
@@ -30,8 +30,7 @@ controller.create = (req,res,next)=>{
 
     const  { branch , type,start,dentist,transaction,servicelist,selectedDate} = req.body
     if(parseInt(type)==1) rules.transaction = "required"
-    if(parseInt(type)==0) rules.servicelist = "required|array"
-
+  
     validator(req.body,rules,message).then(async(response)=>{
         if(!response.status){
             res.json(response.err)
