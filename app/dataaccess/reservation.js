@@ -9,6 +9,40 @@ const fn = Sequelize.fn
 const literal = Sequelize.literal
 
 class Reservation_ {
+    
+    
+    getReservationPaginate(status, branch , page , limit ){
+        return new Promise(async (resolve,reject)=>{
+            let whereclause = { status: parseInt(status) }
+            if(branch != null) whereclause.branchId = branch
+            let data = await Reservation.findAll({
+                include: [
+                    {
+                        model: User.scope(["active"]),
+                        attributes: { exclude: ['createdAt','updatedAt','password'] },
+                        required: true, 
+                    },
+                    {
+                        model: Dentist.scope(["active"]),
+                        required: true, 
+                    },
+                    {
+                        model: Transaction.scope(["active"]),
+                        required: false,
+                    },
+                    {
+                        model: Branch,
+                        required: true,
+                    }
+                ],
+                where: whereclause,
+                offset: (page-1) * limit,
+                limit: limit,  
+            })
+            resolve(data)
+        })
+    }
+
 
     getByStatus(status, branch ){
         return new Promise(async (resolve,reject)=>{
