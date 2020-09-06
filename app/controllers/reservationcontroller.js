@@ -64,65 +64,32 @@ controller.create = (req,res,next)=>{
             })
 
 
-            let services = servicelist.map((service)=>{
-                return {
-                    reservationId: saveReservation.id,
-                    service: service.service,
-                    amount: service.price,
-                    serviceId: service.id,
-                    actualAmount: service.price
-                }
-            })
+          
 
-            let insertServices = await Treatment.bulkCreate(services,{transaction: t})
-
-            if(type == 1){
-                
-                await Treatment.update({
-                    transactionId: 0,
-                    serviceId: 0,
+            if(type == 0){
+                let services = servicelist.map((service)=>{
+                    return {
+                        reservationId: saveReservation.id,
+                        service: service.service,
+                        amount: service.price,
+                        serviceId: service.id,
+                        actualAmount: service.price
+                    }
+                })
+    
+                let insertServices = await Treatment.bulkCreate(services,{transaction: t})
+            }else{
+                let services = await Treatment.update({
+                    reservationId: saveReservation.id
                 },{
                     where: {
                         transactionId: transaction
                     },
                     transaction: t
                 })
-
-                await Treatment.update({
-                    transactionId: transaction
-                },{
-                    where: {
-                        reservationId: saveReservation.id
-                    },
-                    transaction: t
-                })
-            }
-
-
-            // if(type == 0){
-            //     let services = servicelist.map((service)=>{
-            //         return {
-            //             reservationId: saveReservation.id,
-            //             service: service.service,
-            //             amount: service.price,
-            //             serviceId: service.id,
-            //             actualAmount: service.price
-            //         }
-            //     })
-    
-            //     let insertServices = await Treatment.bulkCreate(services,{transaction: t})
-            // }else{
-            //     let services = await Treatment.update({
-            //         reservationId: saveReservation.id
-            //     },{
-            //         where: {
-            //             transactionId: transaction
-            //         },
-            //         transaction: t
-            //     })
        
 
-            // }
+            }
 
             let notificationCreate = await Notification.create({
                 branchId: branch,
