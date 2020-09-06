@@ -9,8 +9,7 @@ const fn = Sequelize.fn
 const literal = Sequelize.literal
 
 class Reservation_ {
-    
-    
+
     getReservationPaginate(status, branch , page , limit ){
         return new Promise(async (resolve,reject)=>{
             let whereclause = { status: parseInt(status) }
@@ -42,7 +41,6 @@ class Reservation_ {
             resolve(data)
         })
     }
-
 
     getByStatus(status, branch ){
         return new Promise(async (resolve,reject)=>{
@@ -96,7 +94,7 @@ class Reservation_ {
                         include: [
                             {
                                 model: Service,
-                                required: true,
+                                required: false,
                             }
                         ]
                     },{
