@@ -115,6 +115,7 @@ app.post('/transaction/getPastListPharmacy',PassportAuthenticate(passport),check
 
 app.post('/reservation/create',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.create)
 app.get('/reservation/get/(:status)',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.getReservation)
+app.post('/reservation/get/(:status)',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.getReservationPaginate)
 app.get('/reservation/info/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.reservationInfo)
 app.patch('/reservation/deny/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.deny)
 app.patch('/reservation/cancel/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,reservationcontroller.cancel)
