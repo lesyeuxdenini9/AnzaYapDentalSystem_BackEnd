@@ -117,6 +117,16 @@ controller.getReservation = async (req,res,next)=> {
         .catch(err=>res.json(err))
 }
 
+controller.getReservationPaginate = async (req,res,next)=>{
+    const userinfo = await req.user
+    const branchid = userinfo.branchId
+    const { status } = req.params
+    const { page , limit } = req.body
+    ReservationData.getReservationPaginate(status , branchid , page , limit )
+        .then(response=>res.json({data: response}))
+        .catch(err=>res.json(err))
+}
+
 controller.reservationInfo = (req,res,next)=>{
     const { idno } = req.params
     ReservationData.reservationInfo(idno)
