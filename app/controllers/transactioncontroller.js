@@ -387,7 +387,8 @@ controller.additionalTreatment = (req,res,next)=>{
                 service: service,
                 amount: regularPrice,
                 serviceId: id,
-                actualAmount: regularPrice
+                actualAmount: regularPrice,
+                default_: 1,
             })
 
             res.json({data: addtreatment})

@@ -96,9 +96,10 @@ controller.pharmacy_daily = async (req,res,next)=>{
 
     let salesdaily = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+    query = `SELECT i.uom,bi.item,bi.description,SUM(bi.qty) as totalcount
             FROM billitems bi
             LEFT JOIN billings b ON b.id = bi.billingId
+            LEFT JOIN medicines i ON bi.medicineId = i.id
             WHERE b.branchId = ${branch} AND ( b.date >= '${start}' AND b.date <= '${end}')
             GROUP BY bi.medicineId
             ORDER BY totalcount DESC`
@@ -120,9 +121,10 @@ controller.pharmacy_monthly = async (req,res,next)=>{
                 ORDER BY YEAR(date) ASC,MONTH(date) ASC`
     let salesmonthly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+    query = `SELECT i.uom,bi.item,bi.description,SUM(bi.qty) as totalcount
             FROM billitems bi
             LEFT JOIN billings b ON b.id = bi.billingId
+            LEFT JOIN medicines i ON bi.medicineId = i.id
             WHERE b.branchId = ${branch} AND ( MONTH(b.date) >= '${startmonth}' AND YEAR(b.date) >= '${startyear}')
             AND  ( MONTH(b.date) <= '${endmonth}' AND YEAR(b.date) <= '${endyear}')
             GROUP BY bi.medicineId
@@ -144,9 +146,10 @@ controller.pharmacy_yearly = async (req,res,next)=>{
                  ORDER BY YEAR(date) ASC`
     let salesyearly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT bi.item,bi.description,SUM(bi.qty) as totalcount
+    query = `SELECT i.uom,bi.item,bi.description,SUM(bi.qty) as totalcount
             FROM billitems bi
             LEFT JOIN billings b ON b.id = bi.billingId
+            LEFT JOIN medicines i ON bi.medicineId = i.id
             WHERE b.branchId = ${branch} AND ( YEAR(b.date) >= '${startyear}' AND YEAR(b.date) <= '${endyear}')
             GROUP BY bi.medicineId
             ORDER BY totalcount DESC`
@@ -175,7 +178,7 @@ const getDentistData = (whereclause,branch)=>{
     
                         },
                         {
-                            model: Treatment,
+                            model: Treatment.scope("default","active"),
                             required: true,
                             attributes: [
                                 "service",
@@ -219,7 +222,7 @@ controller.sales_daily = async (req,res,next)=>{
     let salesdaily = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
     query = `SELECT t.serviceId,s.service,COUNT(t.serviceId) as totalcount 
-             FROM treatments t 
+             FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
              LEFT JOIN transactions tr ON t.transactionId = tr.id 
              LEFT JOIN services s ON s.id = t.serviceId 
              WHERE tr.branchId = ${branch} AND ( tr.transactionDate >= '${start}' AND tr.transactionDate <= '${end}')
@@ -228,7 +231,7 @@ controller.sales_daily = async (req,res,next)=>{
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
     query = `SELECT t.serviceId,s.service,SUM(b.payment) as totalearn 
-             FROM treatments t 
+             FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
              LEFT JOIN transactions tr ON t.transactionId = tr.id 
              LEFT JOIN billings b ON b.transactionId = tr.id
              LEFT JOIN services s ON s.id = t.serviceId 
@@ -270,7 +273,7 @@ controller.sales_monthly = async (req,res,next)=>{
     let salesmonthly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
     query = `SELECT t.serviceId,s.service,COUNT(t.serviceId) as totalcount 
-            FROM treatments t 
+            FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t  
             LEFT JOIN transactions tr ON t.transactionId = tr.id 
             LEFT JOIN services s ON s.id = t.serviceId 
             WHERE tr.branchId = ${branch} AND ( MONTH(tr.transactionDate) >= '${startmonth}' AND YEAR(tr.transactionDate) >= '${startyear}')
@@ -303,7 +306,7 @@ controller.sales_yearly = async (req,res,next)=>{
     let salesyearly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
     query = `SELECT t.serviceId,s.service,COUNT(t.serviceId) as totalcount 
-            FROM treatments t 
+            FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
             LEFT JOIN transactions tr ON t.transactionId = tr.id 
             LEFT JOIN services s ON s.id = t.serviceId 
             WHERE tr.branchId = ${branch} AND ( YEAR(tr.transactionDate) >= '${startyear}' AND YEAR(tr.transactionDate) <= '${endyear}')

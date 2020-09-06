@@ -187,7 +187,7 @@ controller.update = (req,res,next)=>{
             res.json(response.err)
         }else{
             const idno = req.params.idno
-            const { medicine , description , price, manufacturer, stocks , code , limit , scientificName , brand } = req.body
+            const { medicine , description , price, manufacturer, stocks , code , limit , scientificName , brand , uom } = req.body
 
             const newmedicine = {
                 limitMin: limit,
@@ -199,6 +199,7 @@ controller.update = (req,res,next)=>{
                 stocks: stocks, // temp update of stocks should rely on add stocks and reduce stocks module
                 brand: brand,
                 scientificName: scientificName,
+                uom: uom,
             }
 
             let updateresult = await Medicine.update(newmedicine, {where: {id: idno}})

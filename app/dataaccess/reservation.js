@@ -10,6 +10,38 @@ const literal = Sequelize.literal
 
 class Reservation_ {
 
+    getReservationPaginate(status, branch , page , limit ){
+        return new Promise(async (resolve,reject)=>{
+            let whereclause = { status: parseInt(status) }
+            if(branch != null) whereclause.branchId = branch
+            let data = await Reservation.findAll({
+                include: [
+                    {
+                        model: User.scope(["active"]),
+                        attributes: { exclude: ['createdAt','updatedAt','password'] },
+                        required: true, 
+                    },
+                    {
+                        model: Dentist.scope(["active"]),
+                        required: true, 
+                    },
+                    {
+                        model: Transaction.scope(["active"]),
+                        required: false,
+                    },
+                    {
+                        model: Branch,
+                        required: true,
+                    }
+                ],
+                where: whereclause,
+                offset: (page-1) * limit,
+                limit: limit,  
+            })
+            resolve(data)
+        })
+    }
+
     getByStatus(status, branch ){
         return new Promise(async (resolve,reject)=>{
             let whereclause = { status: parseInt(status) }
@@ -57,12 +89,12 @@ class Reservation_ {
                         model: Transaction.scope(["active"]),
                         required: false,
                     },{
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         required: false,
                         include: [
                             {
                                 model: Service,
-                                required: true,
+                                required: false,
                             }
                         ]
                     },{
@@ -130,7 +162,6 @@ class Reservation_ {
             }
         }
         
-        console.log(whereclause)
         return new Promise(async (resolve,reject)=>{
             let data = await Reservation.findAll({
                 include: [
@@ -140,7 +171,7 @@ class Reservation_ {
                         required: true, 
                     },
                     {
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         required: false,
                     },
                     {
@@ -183,7 +214,7 @@ class Reservation_ {
                         required: true, 
                     },
                     {
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         required: false,
                         include: [
                             {
@@ -294,7 +325,7 @@ class Reservation_ {
                         model: Transaction.scope(["active"]),
                         required: false,
                     },{
-                        model: Treatment,
+                        model: Treatment.scope("active"),
                         require: false,
                     }
                 ],

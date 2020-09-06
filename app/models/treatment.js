@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     serviceId: DataTypes.INTEGER,
     actualAmount: DataTypes.FLOAT,
     paymentmethod: DataTypes.STRING,
+    default_: DataTypes.INTEGER,
   }, {});
   Treatment.associate = function(models) {
     Treatment.belongsTo(models.Transaction)
@@ -24,6 +25,12 @@ module.exports = (sequelize, DataTypes) => {
     Treatment.addScope("active",{
       where: {
         archive: 0,
+      }
+    })
+
+    Treatment.addScope("default",{
+      where: {
+        default_: 1,
       }
     })
   }

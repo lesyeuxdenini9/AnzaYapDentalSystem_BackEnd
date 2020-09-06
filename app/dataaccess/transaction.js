@@ -90,7 +90,7 @@ class Transaction_ {
             let data = Transaction.scope(["active"]).findAll({
                     include: [
                         {
-                            model: Treatment.scope(["active"]),
+                            model: Treatment.scope(["active","default"]),
                             required: false,
                         }
                     ],
@@ -124,7 +124,7 @@ class Transaction_ {
                     ],  
                 },
                 {
-                    model: Treatment.scope(["active"]),
+                    model: Treatment.scope(["active","default"]),
                     required: false,
                     include: [
                         {
@@ -242,6 +242,7 @@ class Transaction_ {
                         include: [
                             {
                                 model: Treatment,
+                                where: { archive: 0 , default_: 1},
                                 required: false,
                             },{
                                 model: Billing,

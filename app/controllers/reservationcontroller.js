@@ -19,7 +19,7 @@ controller.create = (req,res,next)=>{
         type: "required",
         start: "required|string",
         dentist: "required",
-        // servicelist: "required|array"
+        servicelist: "required|array"
     }
 
     const message = {
@@ -30,8 +30,7 @@ controller.create = (req,res,next)=>{
 
     const  { branch , type,start,dentist,transaction,servicelist,selectedDate} = req.body
     if(parseInt(type)==1) rules.transaction = "required"
-    if(parseInt(type)==0) rules.servicelist = "required|array"
-
+  
     validator(req.body,rules,message).then(async(response)=>{
         if(!response.status){
             res.json(response.err)
@@ -64,28 +63,66 @@ controller.create = (req,res,next)=>{
                 transaction: t
             })
 
-            if(type == 0){
-                let services = servicelist.map((service)=>{
-                    return {
-                        reservationId: saveReservation.id,
-                        service: service.service,
-                        amount: service.price,
-                        serviceId: service.id,
-                        actualAmount: service.price
-                    }
-                })
-    
-                let insertServices = await Treatment.bulkCreate(services,{transaction: t})
-            }else{
-                let services = await Treatment.update({
-                    reservationId: saveReservation.id
+
+            let services = servicelist.map((service)=>{
+                return {
+                    reservationId: saveReservation.id,
+                    service: service.service,
+                    amount: service.price,
+                    serviceId: service.id,
+                    actualAmount: service.price
+                }
+            })
+
+            let insertServices = await Treatment.bulkCreate(services,{transaction: t})
+
+            if(type == 1){
+                
+                // await Treatment.update({
+                //    // transactionId: 0,
+                //     serviceId: 0,
+                // },{
+                //     where: {
+                //         transactionId: transaction
+                //     },
+                //     transaction: t
+                // })
+
+                await Treatment.update({
+                    transactionId: transaction
                 },{
                     where: {
-                        transactionId: transaction
+                        reservationId: saveReservation.id
                     },
                     transaction: t
                 })
             }
+
+
+            // if(type == 0){
+            //     let services = servicelist.map((service)=>{
+            //         return {
+            //             reservationId: saveReservation.id,
+            //             service: service.service,
+            //             amount: service.price,
+            //             serviceId: service.id,
+            //             actualAmount: service.price
+            //         }
+            //     })
+    
+            //     let insertServices = await Treatment.bulkCreate(services,{transaction: t})
+            // }else{
+            //     let services = await Treatment.update({
+            //         reservationId: saveReservation.id
+            //     },{
+            //         where: {
+            //             transactionId: transaction
+            //         },
+            //         transaction: t
+            //     })
+       
+
+            // }
 
             let notificationCreate = await Notification.create({
                 branchId: branch,
@@ -113,6 +150,16 @@ controller.getReservation = async (req,res,next)=> {
     const branchid = userinfo.branchId
     const { status } = req.params
     ReservationData.getByStatus(status , branchid )
+        .then(response=>res.json({data: response}))
+        .catch(err=>res.json(err))
+}
+
+controller.getReservationPaginate = async (req,res,next)=>{
+    const userinfo = await req.user
+    const branchid = userinfo.branchId
+    const { status } = req.params
+    const { page , limit } = req.body
+    ReservationData.getReservationPaginate(status , branchid , page , limit )
         .then(response=>res.json({data: response}))
         .catch(err=>res.json(err))
 }
@@ -409,7 +456,7 @@ controller.changeReservationDate = async (req,res,next)=>{
     req.body.maxTime = maxt
 
     const rules = {
-        "date": "required|date|after:curdate",
+        "date": "required|date|after_or_equal:curdate",
         "start": `required|date|after_or_equal:minTime`,
         "end": 'required|date|after:start|before_or_equal:maxTime'
     }
@@ -427,9 +474,14 @@ controller.changeReservationDate = async (req,res,next)=>{
 
             req.body.start = formatHour(req.body.start)
             req.body.end = formatHour(req.body.end)
+            // const rules2 = {
+            //     "start": `allowedStartTime:reservations,starttime,${req.body.date},${req.body.dentist}`,
+            //     "end": `allowedEndTime:reservations,endtime,${req.body.date},${req.body.dentist}|allowedMaxEndTime:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.start}`,
+            // }
+
             const rules2 = {
-                "start": `allowedStartTime:reservations,starttime,${req.body.date},${req.body.dentist}`,
-                "end": `allowedEndTime:reservations,endtime,${req.body.date},${req.body.dentist}|allowedMaxEndTime:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.start}`,
+                "start": `allowedStartTimeCheck:reservations,starttime,${req.body.date},${req.body.dentist},${req.body.refno}`,
+                "end": `allowedEndTimeCheck:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.refno}|allowedMaxEndTime:reservations,endtime,${req.body.date},${req.body.dentist},${req.body.start}`,
             }
 
             validator(req.body,rules2,{}).then(async (response)=>{
@@ -446,6 +498,7 @@ controller.changeReservationDate = async (req,res,next)=>{
                                                     Start: start,
                                                     End: end,
                                                     isResched: 1,
+                                                    dentistId: dentist,
                                                 },{
                                                     where: {
                                                         id: info.id
@@ -599,12 +652,25 @@ controller.createFollowupReservation = async (req,res,next)=>{
 
                         return response
                     })
-                    .then((response)=>{
+                    .then(async (response)=>{
                 
                         let treatment = ''
+                        let treatments = []
                         transaction.Treatments.forEach((treat)=>{
                             treatment = `${treatment}<li>${treat.service}</li>`
+                            treatments.push({
+                                transactionId: transaction.id,
+                                service: treat.service,
+                                amount: treat.amount,
+                                reservationId: response.id,
+                                serviceId: treat.serviceId,
+                                actualAmount: treat.actualAmount,
+                            })
                         })
+
+                        let insertServices = await Treatment.bulkCreate(treatments)
+
+
                         const messagehtml = `<div style='height:50px;width:100%;background:#083D55'>
                         <span style="font-size:20pt;padding: 30px 0px 0px 10px; font-weight:bold;"><span style="color:#4167D6">Anza</span><span style="color:white">-</span><span style="color:orange;">Yap</span> <small style="color:white">Dental Clinic</small></span>
                         </div>
@@ -783,7 +849,8 @@ controller.proceedTransaction = async (req,res,next)=>{
             })
 
             const updateTreatments = await Treatment.update({
-                transactionId: saveTransaction.id
+                transactionId: saveTransaction.id,
+                default_: 1,
             },{
                 where: {
                     reservationId: id

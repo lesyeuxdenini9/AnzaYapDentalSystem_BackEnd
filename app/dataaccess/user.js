@@ -14,7 +14,7 @@ class User_ {
         })
     }
 
-    searchPatient({ lastname, middlename , firstname ,email }){
+    searchPatient({ lastname, middlename , firstname ,email , page , limit }){
       let whereclause = {}
       if(lastname!="") whereclause.lastname = { [op.like]: `%${lastname}%`}
       if(middlename!="") whereclause.middlename = { [op.like]: `%${middlename}%`}
@@ -25,6 +25,8 @@ class User_ {
                 {
                     attributes: { exclude: ['createdAt','updatedAt','password'] },
                     where: whereclause,
+                    offset: (page-1) * limit,
+                    limit: limit, 
                     order: [ ['lastname', 'ASC'],['firstname', 'ASC']]                    
                 }
 
