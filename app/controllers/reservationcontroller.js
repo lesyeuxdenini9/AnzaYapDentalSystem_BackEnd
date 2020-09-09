@@ -3,6 +3,7 @@ const validator = require('../helper/validator')
 const ReservationData = require('../dataaccess/reservation')
 const UserData = require('../dataaccess/user')
 const sendemail = require('../helper/sendemail')
+const sendfirebase = require('../helper/sendfirebase')
 const { Reservation,Treatment , Notification, sequelize , Dentist, Branch, Transaction } = require('../models/index')
 const { maskzero } = require('../helper/helper')
 const { format12Hour, formatHour , formatraw12Hour } = require('../helper/helper')
@@ -225,6 +226,7 @@ controller.deny = async (req,res,next)=>{
             <hr/>
             <p>Remarks: Conflict with other schedule. ${remarks}</p>`         
             if(patient.email != "") sendemail(patient.email,"Denied Reservation",messagehtml,2)
+            if(patient.pushnotiftoken != "" && patient.pushnotiftoken != null) sendfirebase(patient.pushnotiftoken,"Denied Reservation",`${reserveNo}\n${remarks}`)
             res.json({data: response})
         })
         .catch(err=>res.json(err))
@@ -271,6 +273,7 @@ controller.cancel = async (req,res,next)=>{
         <hr/>
         <p>Remarks: Sorry for the inconvenience. ${remarks}</p>`         
         if(User.email != "") sendemail(User.email,"Cancelled Reservation",messagehtml,2)
+        if(User.pushnotiftoken != "" && User.pushnotiftoken != null) sendfirebase(User.pushnotiftoken,"Cancelled Reservation",`${reservationNo}\n${remarks}`)
         res.json({data: response})
     })
     .catch(err=>res.json(err))
@@ -541,9 +544,8 @@ controller.changeReservationDate = async (req,res,next)=>{
                             </ul>
                             <hr/>
                             <p>Remarks: ${remarks}</p>`         
-                            if(info.User.email != "") sendemail(info.User.email,"Change Reservation Schedule",messagehtml,2)
-
-                        
+                            if(info.User.email != "") sendemail(info.User.email,"Change Reservation Schedule",messagehtml,2)  
+                            if(info.User.pushnotiftoken != "" && info.User.pushnotiftoken != null) sendfirebase(info.User.pushnotiftoken,"Change Reservation Schedule",`${info.reservationNo}\n${remarks}`)
 
                         res.json({data: notif})
 
@@ -694,7 +696,7 @@ controller.createFollowupReservation = async (req,res,next)=>{
                         `
     
                             if(transaction.User.email != "") sendemail(transaction.User.email,"Approved Reservation",messagehtml,2)
-
+                            if(transaction.User.pushnotiftoken != "" && transaction.User.pushnotiftoken != null) sendfirebase(transaction.User.pushnotiftoken,"Approved Reservation",`R${maskzero(11,response.id)}`)
                         res.json({data: response})
                     })
                     .catch(err=>res.json(err))
@@ -799,6 +801,7 @@ controller.confirm = (req,res,next)=>{
                         `
     
                             if(patient.email != "") sendemail(patient.email,"Approved Reservation",messagehtml,2)
+                            if(patient.pushnotiftoken != "" && patient.pushnotiftoken != null) sendfirebase(patient.pushnotiftoken,"Approved Reservation",`${reserveNo}\n${remarks}`)
                             res.json({data: response})
                         })
                         .catch(err=>res.json(err))
@@ -898,10 +901,10 @@ controller.changeTimeReservation = async (req,res,next)=>{
     const events = req.body
     // const userinfo = await req.user
     // const username = userinfo.fullname
+
     let socketUserid = []
     events.forEach(async (event)=>{
         let eventinfo = await ReservationData.reservationInfo(event.id)
-        
         let updateinfo = await Reservation.update({
             starttime: event.start,
             endtime: event.end,
@@ -954,7 +957,7 @@ controller.changeTimeReservation = async (req,res,next)=>{
         <hr/>
         <p>Remarks:</p>`         
         if(eventinfo.User.email != "") sendemail(eventinfo.User.email,"Change Reservation Time",messagehtml,2)
-
+        if(eventinfo.User.pushnotiftoken != "" && eventinfo.User.pushnotiftoken != null) sendfirebase(eventinfo.User.pushnotiftoken,"Change Reservation Time",`${eventinfo.reservationNo}`)
         socketUserid.push(eventinfo.User.id)
         
     })
