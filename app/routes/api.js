@@ -24,7 +24,7 @@ app.get('/dashboard/getData/(:branch)',PassportAuthenticate(passport),checkisAut
 app.get('/dashboard/dentistTransaction/(:branch)',PassportAuthenticate(passport),checkisAuthenticated,dashboardcontroller.dentistTransaction)
 
 app.post('/user/register',usercontroller.save)
-
+app.post('/user/changearchivestatus',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.changearchivestatus)
 app.post('/user/save',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.save)
 app.post('/user/saveuser_superadmin',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.saveuser_superadmin)
 app.patch('/user/updateuser_superadmin/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.updateuser_superadmin)

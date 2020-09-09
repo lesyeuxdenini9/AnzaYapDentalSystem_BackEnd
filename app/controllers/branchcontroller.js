@@ -6,7 +6,7 @@ const { response } = require('express')
 
 
 controller.save = (req,res,next)=>{
-    const { branch , address , contact , email ,tin } = req.body
+    const { branch , address , contact , email ,tin , vat } = req.body
     const rules = {
         "branch": "required|string",
         "address": "required|string",
@@ -22,6 +22,7 @@ controller.save = (req,res,next)=>{
                 contact: contact,
                 email: email,
                 tin: tin,
+                vat: vat,
             }).then(async (response)=>{
                 let schedules = []
                 let schedulesdes = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -120,7 +121,7 @@ controller.remove = (req,res,next)=>{
 }
 
 controller.update = (req,res,next)=>{
-    const { branch , address , contact , email , id , tin} = req.body
+    const { branch , address , contact , email , id , tin , vat} = req.body
     const rules = {
         "branch": "required|string",
         "address": "required|string",
@@ -135,7 +136,8 @@ controller.update = (req,res,next)=>{
                 address: address,
                 contact: contact,
                 email: email,
-                tin: tin
+                tin: tin,
+                vat: vat,
             },{
                 where: {
                     id: id

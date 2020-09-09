@@ -9,6 +9,19 @@ const { response } = require('../routes/api')
 const saltRounds = 10
 const controller = {}
 
+controller.changearchivestatus = (req,res,next)=>{
+    const { status , id } = req.body
+    let finalstatus = status ? 0 : 1 
+    User.update({
+        archive: finalstatus,
+    },{
+        where: {
+            id: id
+        }
+    }).then((response)=>res.json(response))
+    .catch(err=>console.log(err))
+}
+
 controller.search = (req,res,next)=>{
     const { search , branch , type } = req.body
     UserData.search(search,branch,type).then((response)=>res.json({data: response})).catch(err=>res.status(500).json(err)) 

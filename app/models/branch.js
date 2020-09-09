@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     latitude: DataTypes.FLOAT,
     archive: DataTypes.INTEGER,
     tin: DataTypes.STRING,
+    vat: DataTypes.INTEGER,
   }, {});
   Branch.associate = function(models) {
     // associations can be defined here

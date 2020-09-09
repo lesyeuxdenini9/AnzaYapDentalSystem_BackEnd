@@ -65,7 +65,7 @@ class User_ {
 
     getUser(idno){
         return new Promise((resolve,reject)=>{
-            let data = User.scope(["active","transaction","reservation"]).findOne({
+            let data = User.scope(["transaction","reservation"]).findOne({
                 where: {id: idno},
                 attributes: { exclude: ['createdAt','updatedAt','password'] },
             })
