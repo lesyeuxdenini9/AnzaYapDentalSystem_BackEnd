@@ -313,11 +313,10 @@ controller.createWalkInReservation = async (req,res,next)=>{
         "end": 'required|date|after:start|before_or_equal:maxTime',
         "patient": 'required',
         "dentist": 'required',
+        "servicelist": 'required|array'
     }
 
-    if(type == 0){
-       rules.servicelist = "required|array"
-    }
+    if(parseInt(type)==1) rules.transaction = "required"
 
     const message = {
         "after_or_equal.start": `The Start time must be equal or after ${format12Hour(req.body.minTime)}`,
@@ -373,29 +372,55 @@ controller.createWalkInReservation = async (req,res,next)=>{
                     },
                     transaction: t
                 })
+
+                let services = servicelist.map((service)=>{
+                    return {
+                        reservationId: saveReservation.id,
+                        service: service.service,
+                        amount: service.price,
+                        serviceId: service.id,
+                        actualAmount: service.price
+                    }
+                })
     
-                if(type == 0){
-                    let services = servicelist.map((service)=>{
-                        return {
-                            reservationId: saveReservation.id,
-                            service: service.service,
-                            amount: service.price,
-                            actualAmount: service.price,
-                            serviceId: service.id,
-                        }
-                    })
-        
-                    let insertServices = await Treatment.bulkCreate(services,{transaction: t})
-                }else{
-                    let services = await Treatment.update({
-                        reservationId: saveReservation.id
+                let insertServices = await Treatment.bulkCreate(services,{transaction: t})
+
+                if(type == 1){
+
+                    await Treatment.update({
+                        transactionId: transaction
                     },{
                         where: {
-                            transactionId: transactionid
+                            reservationId: saveReservation.id
                         },
                         transaction: t
                     })
+
                 }
+
+    
+                // if(type == 0){
+                //     let services = servicelist.map((service)=>{
+                //         return {
+                //             reservationId: saveReservation.id,
+                //             service: service.service,
+                //             amount: service.price,
+                //             actualAmount: service.price,
+                //             serviceId: service.id,
+                //         }
+                //     })
+        
+                //     let insertServices = await Treatment.bulkCreate(services,{transaction: t})
+                // }else{
+                //     let services = await Treatment.update({
+                //         reservationId: saveReservation.id
+                //     },{
+                //         where: {
+                //             transactionId: transactionid
+                //         },
+                //         transaction: t
+                //     })
+                // }
     
                 // let notificationCreate = await Notification.create({
                 //     branchId: branch,
