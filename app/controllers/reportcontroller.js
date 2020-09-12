@@ -265,7 +265,7 @@ controller.sales_daily = async (req,res,next)=>{
              FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
              LEFT JOIN transactions tr ON t.transactionId = tr.id 
              LEFT JOIN services s ON s.id = t.serviceId 
-             WHERE tr.branchId = ${branch} AND ( tr.transactionDate >= '${start}' AND tr.transactionDate <= '${end}')
+             WHERE tr.branchId = ${branch} AND ( tr.transactionDate >= '${start}' AND tr.transactionDate <= '${end}') AND s.id <> 0
              GROUP BY t.serviceId
              ORDER BY totalcount DESC`
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
@@ -319,7 +319,7 @@ controller.sales_monthly = async (req,res,next)=>{
             FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t  
             LEFT JOIN transactions tr ON t.transactionId = tr.id 
             LEFT JOIN services s ON s.id = t.serviceId 
-            WHERE tr.branchId = ${branch} AND ( MONTH(tr.transactionDate) >= '${startmonth}' AND YEAR(tr.transactionDate) >= '${startyear}')
+            WHERE tr.branchId = ${branch} AND ( MONTH(tr.transactionDate) >= '${startmonth}' AND YEAR(tr.transactionDate) >= '${startyear}') AND s.id <> 0
             AND  ( MONTH(tr.transactionDate) <= '${endmonth}' AND YEAR(tr.transactionDate) <= '${endyear}')
             GROUP BY t.serviceId
             ORDER BY totalcount DESC`
@@ -352,7 +352,7 @@ controller.sales_yearly = async (req,res,next)=>{
             FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
             LEFT JOIN transactions tr ON t.transactionId = tr.id 
             LEFT JOIN services s ON s.id = t.serviceId 
-            WHERE tr.branchId = ${branch} AND ( YEAR(tr.transactionDate) >= '${startyear}' AND YEAR(tr.transactionDate) <= '${endyear}')
+            WHERE tr.branchId = ${branch} AND ( YEAR(tr.transactionDate) >= '${startyear}' AND YEAR(tr.transactionDate) <= '${endyear}') AND s.id <> 0
             GROUP BY t.serviceId
             ORDER BY totalcount DESC`
 
