@@ -1,6 +1,6 @@
 const controller = {}
 const validator = require('../helper/validator')
-const { Billing , Transaction , Dentist , User, sequelize , Billitem , Treatment } = require('../models/index')
+const { Billing , Transaction , Dentist , User, sequelize , Billitem , Treatment , Service} = require('../models/index')
 const Sequelize = require('sequelize')
 const { STRING } = require('sequelize')
 const { response } = require('express')
@@ -211,6 +211,46 @@ const getDentistData = (whereclause,branch)=>{
    
 }
 
+controller.getByGender = async (req,res,next)=>{
+
+    const { search , service, flag } = req.body
+    let genderData
+    let query
+
+    if(flag == 1){
+        query = `SELECT tr.transactionDate,COUNT(CASE WHEN u.gender = 'Male' THEN u.gender END) as MaleCount, COUNT(CASE WHEN u.gender = 'Female' THEN u.gender END) as FemaleCount 
+                     FROM transactions tr 
+                     LEFT JOIN treatments t ON t.transactionId = tr.id AND t.default_ = 1 AND t.archive = 0
+                     LEFT JOIN users U ON u.id = tr.userId
+                     WHERE tr.branchId = ${search.branch} AND ( tr.transactionDate >= '${search.start}' AND tr.transactionDate <= '${search.end}') AND t.serviceId = ${service.serviceId}
+                     GROUP BY tr.transactionDate`
+        
+    }else if(flag == 2){
+        query = `SELECT MONTH(tr.transactionDate) as monthname,YEAR(tr.transactionDate) as yearname,COUNT(CASE WHEN u.gender = 'Male' THEN u.gender END) as MaleCount, COUNT(CASE WHEN u.gender = 'Female' THEN u.gender END) as FemaleCount 
+                FROM transactions tr 
+                LEFT JOIN treatments t ON t.transactionId = tr.id AND t.default_ = 1 AND t.archive = 0
+                LEFT JOIN users U ON u.id = tr.userId
+                WHERE tr.branchId = ${search.branch} AND ( MONTH(tr.transactionDate) >= '${search.startmonth}' AND YEAR(tr.transactionDate) >= '${search.startyear}')
+                AND  ( MONTH(tr.transactionDate) <= '${search.endmonth}' AND YEAR(tr.transactionDate) <= '${search.endyear}') 
+                AND t.serviceId = ${service.serviceId}
+                GROUP BY YEAR(tr.transactionDate),MONTH(tr.transactionDate)`
+    }else{
+        query = `SELECT YEAR(tr.transactionDate) as yearname,COUNT(CASE WHEN u.gender = 'Male' THEN u.gender END) as MaleCount, COUNT(CASE WHEN u.gender = 'Female' THEN u.gender END) as FemaleCount 
+                FROM transactions tr 
+                LEFT JOIN treatments t ON t.transactionId = tr.id AND t.default_ = 1 AND t.archive = 0
+                LEFT JOIN users U ON u.id = tr.userId
+                WHERE tr.branchId = ${search.branch} AND ( YEAR(tr.transactionDate) >= '${search.startyear}' AND YEAR(tr.transactionDate) <= '${search.endyear}')
+                AND t.serviceId = ${service.serviceId}
+                GROUP BY YEAR(tr.transactionDate)`
+    }
+
+    genderData = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
+
+    res.json({genderData: genderData})
+ 
+}
+
+
 controller.sales_daily = async (req,res,next)=>{
     const { start ,end , branch } = req.body
     let query = `SELECT SUM(payment) AS totalsales,date FROM billings 
@@ -241,6 +281,10 @@ controller.sales_daily = async (req,res,next)=>{
 
     let servicegrapEarn = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
+    let servicearray = servicegrapEarn.map((service)=>{
+        return service.serviceId
+    })
+
     let dentistdata = await getDentistData({
         [op.and]: [
             {
@@ -257,7 +301,6 @@ controller.sales_daily = async (req,res,next)=>{
    
     res.json({graph: salesdaily, serviceMostavail: servicegraphAvail ,serviceMostEarn: servicegrapEarn, dentistdata: dentistdata })
 }
-
 
 
 controller.sales_monthly = async (req,res,next)=>{
