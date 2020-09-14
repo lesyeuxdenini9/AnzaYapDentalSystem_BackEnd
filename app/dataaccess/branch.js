@@ -99,7 +99,7 @@ class Branch_ {
                         Branch.scope("active","schedules").findAll({
                             include: [
                                 {
-                                    model: Medicine,
+                                    model: Medicine.scope("active"),
                                     required: false,
                                 }
                             ]
@@ -118,7 +118,7 @@ class Branch_ {
                         Branch.scope("active", "schedules").findAll({
                             include: [
                                 {
-                                    model: Medicine,
+                                    model: Medicine.scope("active"),
                                     required: false,
                                 }
                             ],
