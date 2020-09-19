@@ -9,7 +9,8 @@ class User_ {
 
     search(search,branch,type){
         return new Promise((resolve,reject)=>{
-            let data = User.scope(["active"]).findAll({where: {fullname: {[op.like]: `%${search}%`},branchId: branch,usertype: type}})
+            // let data = User.scope(["active"]).findAll({where: {fullname: {[op.like]: `%${search}%`},branchId: branch,usertype: type}})
+            let data = User.findAll({where: {fullname: {[op.like]: `%${search}%`},branchId: branch,usertype: type}})
             resolve(data)
         })
     }
@@ -59,6 +60,17 @@ class User_ {
                     exclude: ["password"]
                 },
                 where: {usertype: type}})
+            resolve(data)
+        })
+    }
+
+    getUsersbyArchive(type,archive){
+        return new Promise((resolve,reject)=>{
+            let data = User.findAll({
+                attributes: {
+                    exclude: ["password"]
+                },
+                where: {usertype: type,archive: archive}})
             resolve(data)
         })
     }

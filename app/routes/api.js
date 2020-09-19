@@ -32,6 +32,8 @@ app.get('/user/getlist',PassportAuthenticate(passport),checkisAuthenticated,user
 app.get('/user/getlist/(:user)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.getUser)
 app.patch('/user/update/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.update)
 app.patch('/user/archive/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.archive)
+app.patch('/user/archive/(:idno)/(:status)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.archivebystatus)
+
 app.patch('/user/changepass/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.changepass)
 app.patch('/user/changepassEmployee/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.changepassEmployee)
 app.post('/user/changepic',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.changepic)
@@ -41,6 +43,7 @@ app.delete('/user/remove/(:idno)',PassportAuthenticate(passport),checkisAuthenti
 app.get('/user/details/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.getDetails)
 
 app.get('/user/list/(:type)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.getUserList)
+app.get('/user/list/(:type)/(:archive)',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.getUsersbyArchive)
 
 app.post('/user/addpatient',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.addPatient)
 app.post('/user/searchPatient',PassportAuthenticate(passport),checkisAuthenticated,usercontroller.searchPatient)
@@ -51,13 +54,14 @@ app.post('/updateSchedule',PassportAuthenticate(passport),checkisAuthenticated,s
 
 app.get('/service/list/(:branch)',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.getlist)
 app.post('/service/save',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.save)
-app.patch('/service/archive/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.archive)
+app.patch('/service/archive/(:idno)/(:status)',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.archive)
 app.patch('/service/update/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.update)
 app.post('/service/search',PassportAuthenticate(passport),checkisAuthenticated,servicecontroller.search)
 
 app.get('/medicine/list/(:branch)/(:type)',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.getlist)
 app.post('/medicine/save',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.save)
 app.patch('/medicine/archive/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.archive)
+app.patch('/medicine/retrieve/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.retrieve)
 app.patch('/medicine/update/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.update)
 app.post(`/medicine/addstock`,PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.addstock)
 app.post('/medicine/getStocksin',PassportAuthenticate(passport),checkisAuthenticated,medicinecontroller.getStocksin)
@@ -68,13 +72,22 @@ app.post('/medicine/stockinfo',PassportAuthenticate(passport),checkisAuthenticat
 
 app.post('/branch/save',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.save)
 app.get('/branch/list',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.list)
+app.get('/branch/list/(:archive)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.listbyarchive)
 app.get('/branch/publicList',branchcontroller.publicList)
 app.patch('/branch/remove',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.remove)
+app.patch('/branch/archivelist',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.archivelist)
 app.patch('/branch/update',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.update)
 app.get('/branch/getListUser/(:type)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListUser)
+app.get('/branch/getListUser/(:type)/(:archive)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListUserbyArchive)
 app.get('/branch/getListService',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListService)
+app.get('/branch/getListServiceByArchive/(:archive)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListServiceByArchive)
 app.get('/branch/getListDentist',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListDentist)
+
+app.get('/branch/getListDentistbyArchive/(:archive)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListDentistbyArchive)
+
+
 app.get('/branch/getListMedicine/(:type)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListMedicine)
+app.get('/branch/getListMedicine/(:type)/(:archive)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListMedicineByArchive)
 app.get('/branch/getListAllInfo',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getListAllInfo)
 app.get('/branch/getInfo/(:idno)/(:type)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.getInfo)
 app.get('/branch/search/(:branch)',PassportAuthenticate(passport),checkisAuthenticated,branchcontroller.search)
@@ -82,6 +95,7 @@ app.get('/branch/search/(:branch)',PassportAuthenticate(passport),checkisAuthent
 app.get('/dentist/list',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.getlist)
 app.post('/dentist/save',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.save)
 app.patch('/dentist/archive/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.archive)
+app.patch('/dentist/archive/(:idno)/(:archive)',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.archivebystatus)
 app.patch('/dentist/update/(:idno)',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.update)
 app.post('/dentist/search',PassportAuthenticate(passport),checkisAuthenticated,dentistcontroller.search)
 

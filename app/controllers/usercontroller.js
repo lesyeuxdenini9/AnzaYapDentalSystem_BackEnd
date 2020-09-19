@@ -374,6 +374,12 @@ controller.getUserList = (req,res,next)=>{
     UserData.getUserAll(usertype).then(result=>res.json({data: result})).catch(err=>res.json(err))
 }
 
+controller.getUsersbyArchive = (req,res,next)=>{
+    const { type , archive } = req.params
+    let archivestatus = archive == "true" ? 0 : 1
+    UserData.getUsersbyArchive(type,archivestatus).then(result=>res.json({data: result})).catch(err=>res.json(err))
+}
+
 controller.getUser = (req,res,next)=>{
     const user = req.params.user
     UserData.searchUser(user).then(result=>res.json({data: result})).catch(err=>res.json(err))  
@@ -469,6 +475,13 @@ controller.update = (req,res,next)=>{
 controller.archive = async (req,res,next)=>{
     const idno = req.params.idno
     let archiveres = await User.update({archive: 1},{where: {id: idno}})
+    if(!archiveres)res.status(500).json("something went wrong")
+    if(archiveres) res.json("archived")
+}
+
+controller.archivebystatus = async (req,res,next)=>{
+    const {idno,status} = req.params
+    let archiveres = await User.update({archive: status},{where: {id: idno}})
     if(!archiveres)res.status(500).json("something went wrong")
     if(archiveres) res.json("archived")
 }

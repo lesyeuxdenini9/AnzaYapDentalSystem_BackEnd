@@ -26,13 +26,14 @@ controller.save = (req,res,next)=>{
         if(!response.status){
             res.json(response.err)
         }else{
-            const {branch, service , description , regularPrice } = req.body
+            const {branch, service , description , regularPrice , category } = req.body
 
             const newservice = {
                 service: service,
                 description: description,
                 regularPrice: regularPrice,
                 branchId: branch,
+                category: category,
             }
 
             const serviceInfo = await Service.create(newservice)
@@ -42,8 +43,8 @@ controller.save = (req,res,next)=>{
 }
 
 controller.archive = async (req,res,next)=>{
-    const idno = req.params.idno
-    let archiveres = await Service.update({archive: 1},{where: {id: idno}})
+    const {idno,status} = req.params
+    let archiveres = await Service.update({archive: status},{where: {id: idno}})
     if(!archiveres)res.status(500).json("something went wrong")
     if(archiveres) res.json("archived")
 }
@@ -61,13 +62,14 @@ controller.update = (req,res,next)=>{
             res.json(response.err)
         }else{
             const idno = req.params.idno
-            const { branchId, service , description , regularPrice } = req.body
+            const { branchId, service , description , regularPrice , category } = req.body
 
             const newservice = {
                 branchId: branchId,
                 service: service,
                 description: description,
                 regularPrice: regularPrice,
+                category: category,
             }
 
             let updateresult = await Service.update(newservice, {where: {id: idno}})

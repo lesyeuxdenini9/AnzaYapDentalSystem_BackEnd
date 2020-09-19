@@ -168,6 +168,14 @@ controller.archive = async (req,res,next)=>{
     if(archiveres) res.json("archived")
 }
 
+
+controller.retrieve = async (req,res,next)=>{
+    const idno = req.params.idno
+    let archiveres = await Medicine.update({archive: 0},{where: {id: idno}})
+    if(!archiveres)res.status(500).json("something went wrong")
+    if(archiveres) res.json("archived")
+}
+
 controller.update = (req,res,next)=>{
     
     const rules = {

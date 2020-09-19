@@ -52,6 +52,15 @@ controller.archive = async (req,res,next)=>{
     if(archiveres) res.json("archived")
 }
 
+controller.archivebystatus = async (req,res,next)=>{
+    const {idno,archive} = req.params
+    let archiveres = await Dentist.update({archive: archive},{where: {id: idno}})
+    if(!archiveres)res.status(500).json("something went wrong")
+    if(archiveres) res.json("archived")
+}
+
+
+
 controller.update = (req,res,next)=>{
     
     const rules = {
