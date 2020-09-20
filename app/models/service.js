@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     archive: DataTypes.INTEGER,
     service: DataTypes.STRING,
     branchId: DataTypes.INTEGER,
+    category: DataTypes.STRING,
   }, {});
   Service.associate = function(models) {
     // associations can be defined here

@@ -23,7 +23,8 @@ class Service_ {
 
     search(search,branch){
         return new Promise((resolve,reject)=>{
-            let data = Service.scope(["active"]).findAll({where: {service: {[op.like]: `%${search}%`},branchId: branch}})
+            // let data = Service.scope(["active"]).findAll({where: {service: {[op.like]: `%${search}%`},branchId: branch}})
+            let data = Service.findAll({where: {service: {[op.like]: `%${search}%`},branchId: branch}})
             resolve(data)
         })
     }

@@ -19,7 +19,7 @@ class Dentist_ {
 
     search(search,branch){
         return new Promise((resolve,reject)=>{
-            let data = Dentist.scope(["active"]).findAll({where: {branchId: branch, fullname : {[op.like]: `%${search}%`}}})
+            let data = Dentist.findAll({where: {branchId: branch, fullname : {[op.like]: `%${search}%`}}})
             resolve(data)
         })
     }

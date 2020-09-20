@@ -49,6 +49,18 @@ module.exports = (sequelize, DataTypes) => {
         }],
     }))
 
+    Branch.addScope("usersbyarchive",(data)=>({
+      include: [{
+          model: models.User,
+          attributes: {excludes: ["password"]},
+          where: {
+            usertype: data[0],
+            archive: data[1]
+          },  
+          required: false,
+      }],
+  }))
+
     Branch.addScope("medicines",(type)=>({
       include: [{
           model: models.Medicine.scope("active"),
@@ -59,6 +71,18 @@ module.exports = (sequelize, DataTypes) => {
       }],
   }))
 
+  Branch.addScope("medicinesbyarchive",(data)=>({
+        include: [{
+          model: models.Medicine,
+          where: {
+            type: data.type,
+            archive: data.archive
+          },  
+          required: false,
+      }],
+  }))
+
+
     Branch.addScope("services",{
       include: [{
         model: models.Service,
@@ -66,6 +90,23 @@ module.exports = (sequelize, DataTypes) => {
         required: false,
       }]
     })
+
+    Branch.addScope("servicesbyarchive",(archive)=>({
+      include: [{
+        model: models.Service,
+        where: {archive:archive},
+        required: false,
+      }]
+    }))
+
+    Branch.addScope("dentistbyarchive",(archive)=>({
+      include: [{
+        model: models.Dentist,
+        where: {archive:archive},
+        required: false,
+      }]
+    }))
+
 
     Branch.addScope("dentist",{
       include: [{

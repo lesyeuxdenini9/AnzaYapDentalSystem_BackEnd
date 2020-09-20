@@ -60,11 +60,29 @@ controller.list = async (req,res,next)=>{
         .catch(err=>res.status(500).json(err))
 }
 
+controller.listbyarchive = async (req,res,next)=>{
+    const userinfo = await req.user
+    const branchid = userinfo.branchId
+    let archivestatus = req.params.archive == "true" ? 0 : 1
+    BranchData.listbyarchive(branchid,archivestatus)
+        .then((response)=>res.json({data: response}))
+        .catch(err=>res.status(500).json(err))
+}
+
 controller.getListUser = async (req,res,next)=>{
     const { type } = req.params
     const userinfo = await req.user
     const branchid = userinfo.branchId
     BranchData.getListUser(branchid,type)
+        .then((response)=>res.json({data: response}))
+        .catch(err=>res.status(500).json(err))
+}
+
+controller.getListUserbyArchive = async (req,res,next)=>{
+    const { type , archive } = req.params
+    const userinfo = await req.user
+    const branchid = userinfo.branchId
+    BranchData.getListUserbyArchive(branchid,type, archive)
         .then((response)=>res.json({data: response}))
         .catch(err=>res.status(500).json(err))
 }
@@ -78,10 +96,30 @@ controller.getListMedicine = async (req,res,next)=>{
         .catch(err=>res.status(500).json(err))
 }
 
+controller.getListMedicineByArchive = async (req,res,next)=>{
+    const { type, archive } = req.params
+    const userinfo = await req.user
+    const branchid = userinfo.branchId
+    let archivestatus = archive == "true" ? 0 : 1
+    BranchData.getListMedicineByArchive(branchid,type,archivestatus)
+        .then((response)=>res.json({data: response}))
+        .catch(err=>res.status(500).json(err))
+}
+
 controller.getListService = async (req,res,next)=>{
     const userinfo = await req.user
     const branchid = userinfo.branchId
     BranchData.getListService(branchid)
+        .then((response)=>res.json({data: response}))
+        .catch(err=>res.status(500).json(err))
+}
+
+controller.getListServiceByArchive = async (req,res,next)=>{
+    const userinfo = await req.user
+    const branchid = userinfo.branchId
+    const {archive} = req.params
+    let archivestatus = archive == "true" ? 0 : 1
+    BranchData.getListServiceByArchive(branchid,archivestatus)
         .then((response)=>res.json({data: response}))
         .catch(err=>res.status(500).json(err))
 }
@@ -93,6 +131,16 @@ controller.getListDentist = async (req,res,next)=>{
         .then((response)=>res.json({data: response}))
         .catch(err=>res.status(500).json(err))
 }
+
+controller.getListDentistbyArchive = async (req,res,next)=>{
+    const userinfo = await req.user
+    const branchid = userinfo.branchId
+    let archive = req.params.archive == "true" ? 0 : 1
+    BranchData.getListDentistbyArchive(branchid,archive)
+        .then((response)=>res.json({data: response}))
+        .catch(err=>res.status(500).json(err))
+}
+
 
 controller.getListAllInfo = async (req,res,next)=>{
     const userinfo = await req.user
@@ -112,6 +160,17 @@ controller.getInfo = (req,res,next)=>{
 controller.remove = (req,res,next)=>{
     Branch.update({
         archive:1,
+    },{
+        where: {
+            id: req.body.id
+        }
+    }).then(response=>res.json({data:response}))
+    .catch(err=>res.status(500).json(err))
+}
+
+controller.archivelist = (req,res,next)=>{
+    Branch.update({
+        archive:req.body.archive,
     },{
         where: {
             id: req.body.id

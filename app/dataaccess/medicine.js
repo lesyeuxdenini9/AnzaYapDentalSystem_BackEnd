@@ -6,7 +6,7 @@ class Medicine_ {
 
     search(search,branch,type){
         return new Promise((resolve,reject)=>{
-            let data = Medicine.scope("active").findAll({
+            let data = Medicine.findAll({
                 where: {
                     branchId: branch,
                     type: type,

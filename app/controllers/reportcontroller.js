@@ -261,7 +261,7 @@ controller.sales_daily = async (req,res,next)=>{
                  ORDER BY date ASC`
     let salesdaily = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT t.serviceId,s.service,COUNT(t.serviceId) as totalcount 
+    query = `SELECT t.serviceId,s.service,s.category,COUNT(t.serviceId) as totalcount 
              FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
              LEFT JOIN transactions tr ON t.transactionId = tr.id 
              LEFT JOIN services s ON s.id = t.serviceId 
@@ -270,7 +270,7 @@ controller.sales_daily = async (req,res,next)=>{
              ORDER BY totalcount DESC`
     let servicegraphAvail = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT t.serviceId,s.service,SUM(b.payment) as totalearn 
+    query = `SELECT t.serviceId,s.service,s.category,SUM(b.payment) as totalearn 
              FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
              LEFT JOIN transactions tr ON t.transactionId = tr.id 
              LEFT JOIN billings b ON b.transactionId = tr.id
@@ -315,7 +315,7 @@ controller.sales_monthly = async (req,res,next)=>{
                  ORDER BY YEAR(date) ASC,MONTH(date) ASC`
     let salesmonthly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT t.serviceId,s.service,COUNT(t.serviceId) as totalcount 
+    query = `SELECT t.serviceId,s.service,s.category,COUNT(t.serviceId) as totalcount 
             FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t  
             LEFT JOIN transactions tr ON t.transactionId = tr.id 
             LEFT JOIN services s ON s.id = t.serviceId 
@@ -348,7 +348,7 @@ controller.sales_yearly = async (req,res,next)=>{
                  ORDER BY YEAR(date) ASC`
     let salesyearly = await sequelize.query(query,{type: sequelize.QueryTypes.SELECT})
 
-    query = `SELECT t.serviceId,s.service,COUNT(t.serviceId) as totalcount 
+    query = `SELECT t.serviceId,s.service,s.category,COUNT(t.serviceId) as totalcount 
             FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0 ) t 
             LEFT JOIN transactions tr ON t.transactionId = tr.id 
             LEFT JOIN services s ON s.id = t.serviceId 
