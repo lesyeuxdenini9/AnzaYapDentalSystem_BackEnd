@@ -12,7 +12,35 @@ controller.getData = async (req,res,next)=>{
     const yearsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND branchId = ?  AND isPharmacy = 0",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
     const monthsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND MONTH(createdAt) = MONTH(NOW()) AND branchId = ?  AND isPharmacy = 0",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
    
-   
+
+    const servicetodaycount = await sequelize.query(`SELECT s.category,COUNT(t.serviceId) as totalcount FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0) t
+                                                    LEFT JOIN transactions tr ON t.transactionId = tr.id
+                                                    LEFT JOIN services s ON s.id = t.serviceId
+                                                    WHERE tr.branchId = ? 
+                                                    AND DATE(tr.transactionDate) = DATE(NOW())
+                                                    AND s.category IS NOT NULL
+                                                    GROUP BY s.category`,
+                                                {replacements: [branch], type: sequelize.QueryTypes.SELECT})
+
+    const serviceyearcount = await sequelize.query(`SELECT s.category,COUNT(t.serviceId) as totalcount FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0) t
+                                                    LEFT JOIN transactions tr ON t.transactionId = tr.id
+                                                    LEFT JOIN services s ON s.id = t.serviceId
+                                                    WHERE tr.branchId = ? 
+                                                    AND YEAR(tr.transactionDate) = YEAR(NOW())
+                                                    AND s.category IS NOT NULL
+                                                    GROUP BY s.category`,
+                                                {replacements: [branch], type: sequelize.QueryTypes.SELECT})
+
+    const servicemonthcount = await sequelize.query(`SELECT s.category,COUNT(t.serviceId) as totalcount FROM ( SELECT * FROM treatments WHERE default_ = 1 AND archive = 0) t
+                                                    LEFT JOIN transactions tr ON t.transactionId = tr.id
+                                                    LEFT JOIN services s ON s.id = t.serviceId
+                                                    WHERE tr.branchId = ? 
+                                                    AND YEAR(tr.transactionDate) = YEAR(NOW())
+                                                    AND MONTH(tr.transactionDate) = MONTH(NOW())
+                                                    AND s.category IS NOT NULL
+                                                    GROUP BY s.category`,
+                                                {replacements: [branch], type: sequelize.QueryTypes.SELECT})
+
     const P_todaysales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE DATE(createdAt) = DATE(NOW()) AND branchId = ? AND isPharmacy = 1",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
     const P_yearsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND branchId = ?  AND isPharmacy = 1",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
     const P_monthsales = await sequelize.query("SELECT SUM(payment) as total FROM billings WHERE YEAR(createdAt) = YEAR(NOW()) AND MONTH(createdAt) = MONTH(NOW()) AND branchId = ?  AND isPharmacy = 1",{replacements: [branch], type: sequelize.QueryTypes.SELECT})
@@ -75,6 +103,9 @@ controller.getData = async (req,res,next)=>{
         pmonthsales: P_monthsales[0].total != null ? P_monthsales[0].total : 0,
         appointmenttoday: appointmenttoday,
         weeksales: last7date,
+        servicetodaycount: servicetodaycount,
+        serviceyearcount: serviceyearcount,
+        servicemonthcount: servicemonthcount,
     })
 }
 
